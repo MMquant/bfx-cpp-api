@@ -26,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		302D3DAE1E38E51E00E3A3F1 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3096E7901E37DEAC00F2C1B4 /* bfx-api-cpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "bfx-api-cpp"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3096E7931E37DEAC00F2C1B4 /* console-wrapper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "console-wrapper.cpp"; sourceTree = "<group>"; };
 		3096E79B1E37DFC500F2C1B4 /* libcryptopp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcryptopp.dylib; path = ../../../../../usr/local/Cellar/cryptopp/5.6.5/lib/libcryptopp.dylib; sourceTree = "<group>"; };
@@ -50,6 +51,7 @@
 		3096E7871E37DEAC00F2C1B4 = {
 			isa = PBXGroup;
 			children = (
+				302D3DAE1E38E51E00E3A3F1 /* .gitignore */,
 				3096E7921E37DEAC00F2C1B4 /* bfx-api-cpp */,
 				3096E7911E37DEAC00F2C1B4 /* Products */,
 				3096E79A1E37DFC500F2C1B4 /* Frameworks */,
@@ -284,6 +286,7 @@
 				3096E7991E37DEAC00F2C1B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
