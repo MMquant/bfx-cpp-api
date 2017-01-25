@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		302D3DB11E38E68F00E3A3F1 /* BitfinexAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 302D3DAF1E38E68F00E3A3F1 /* BitfinexAPI.cpp */; };
 		3096E7941E37DEAC00F2C1B4 /* console-wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3096E7931E37DEAC00F2C1B4 /* console-wrapper.cpp */; };
 		3096E79C1E37DFC500F2C1B4 /* libcryptopp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3096E79B1E37DFC500F2C1B4 /* libcryptopp.dylib */; };
 		3096E79E1E37DFDE00F2C1B4 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3096E79D1E37DFDE00F2C1B4 /* libcurl.4.dylib */; };
-		3096E7A11E37E2CF00F2C1B4 /* BitfinexAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3096E79F1E37E2CF00F2C1B4 /* BitfinexAPI.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,12 +27,12 @@
 
 /* Begin PBXFileReference section */
 		302D3DAE1E38E51E00E3A3F1 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		302D3DAF1E38E68F00E3A3F1 /* BitfinexAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BitfinexAPI.cpp; sourceTree = "<group>"; };
+		302D3DB01E38E68F00E3A3F1 /* BitfinexAPI.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BitfinexAPI.hpp; sourceTree = "<group>"; };
 		3096E7901E37DEAC00F2C1B4 /* bfx-api-cpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "bfx-api-cpp"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3096E7931E37DEAC00F2C1B4 /* console-wrapper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "console-wrapper.cpp"; sourceTree = "<group>"; };
 		3096E79B1E37DFC500F2C1B4 /* libcryptopp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcryptopp.dylib; path = ../../../../../usr/local/Cellar/cryptopp/5.6.5/lib/libcryptopp.dylib; sourceTree = "<group>"; };
 		3096E79D1E37DFDE00F2C1B4 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = ../../../../../usr/local/Cellar/curl/7.52.1/lib/libcurl.4.dylib; sourceTree = "<group>"; };
-		3096E79F1E37E2CF00F2C1B4 /* BitfinexAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BitfinexAPI.cpp; path = ../BitfinexAPI.cpp; sourceTree = "<group>"; };
-		3096E7A01E37E2CF00F2C1B4 /* BitfinexAPI.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = BitfinexAPI.hpp; path = ../BitfinexAPI.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,8 +69,8 @@
 		3096E7921E37DEAC00F2C1B4 /* bfx-api-cpp */ = {
 			isa = PBXGroup;
 			children = (
-				3096E79F1E37E2CF00F2C1B4 /* BitfinexAPI.cpp */,
-				3096E7A01E37E2CF00F2C1B4 /* BitfinexAPI.hpp */,
+				302D3DAF1E38E68F00E3A3F1 /* BitfinexAPI.cpp */,
+				302D3DB01E38E68F00E3A3F1 /* BitfinexAPI.hpp */,
 				3096E7931E37DEAC00F2C1B4 /* console-wrapper.cpp */,
 			);
 			path = "bfx-api-cpp";
@@ -143,7 +143,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3096E7941E37DEAC00F2C1B4 /* console-wrapper.cpp in Sources */,
-				3096E7A11E37E2CF00F2C1B4 /* BitfinexAPI.cpp in Sources */,
+				302D3DB11E38E68F00E3A3F1 /* BitfinexAPI.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
