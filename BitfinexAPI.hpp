@@ -36,6 +36,14 @@ public:
                        int limit_asks = 50);
     int getOrderBook(string &result, string symbol, int limit_bids = 50,
                      int limit_asks = 50, bool group = 1);
+    int getTrades(string &result, string symbol, time_t since = 0,
+                  int limit_trades = 50);
+    int getLends(string &result, string currency, time_t since = 0,
+                  int limit_lends = 50);
+    int getSymbols(string &result);
+    int getSymbolDetails(string &result);
+    
+    // Authenticated endpoints
     
 private:
     
@@ -43,19 +51,16 @@ private:
     BitfinexAPI(const BitfinexAPI&);
     BitfinexAPI &operator=(const BitfinexAPI&);
     
-    // Static private variables
-    static const string apiUrl;
+    // Private variables
+    string APIurl;
     vector<string> symbols; // possible symbol pairs
     vector<string> currencies; // possible currencies
-    
-    // Private variables
     string accessKey, secretKey;
     CURL *curl;
     CURLcode res;
-    string APIurl;
     
     // Support private methods
-    static string getHmacSha384(const string &key, const string &content);
+    static int getHmacSha384(const string &key, const string &content, string &digest);
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp);
     static bool inArray(const string &value, const vector<string> &symbols);
     int DoGETrequest(const string &UrlEndPoint, const string &params, string &result);
