@@ -4,3 +4,9 @@
 *.pbxproj
 
 bfx-api-cpp.xcodeproj/project.pbxproj
+
+*.xcscheme
+
+bfx-api-cpp.xcodeproj/project.pbxproj
+
+bfx-api-cpp.xcodeproj/xcuserdata/jvr23.xcuserdatad/xcschemes/bfx-api-cpp.xcscheme
