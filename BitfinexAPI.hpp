@@ -1,3 +1,8 @@
+
+//////////////////////////////////////////////////////////////////////////////
+// BitfinexAPI.hpp
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 
@@ -39,11 +44,14 @@ public:
     int getTrades(string &result, string symbol, time_t since = 0,
                   int limit_trades = 50);
     int getLends(string &result, string currency, time_t since = 0,
-                  int limit_lends = 50);
+                 int limit_lends = 50);
     int getSymbols(string &result);
     int getSymbolDetails(string &result);
     
     // Authenticated endpoints
+    int getAccountInfo(string &result);
+    
+    
     
 private:
     
@@ -60,6 +68,8 @@ private:
     CURLcode res;
     
     // Support private methods
+    static string getTonce();
+    static int getBase64(const string &content, string &base64);
     static int getHmacSha384(const string &key, const string &content, string &digest);
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp);
     static bool inArray(const string &value, const vector<string> &symbols);

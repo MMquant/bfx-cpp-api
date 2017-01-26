@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
         getline(ifs, secretKey);
         BitfinexAPI bfxAPI(accessKey, secretKey);
         string result1;
-        int code = bfxAPI.getSymbolDetails(result1);
+        int code = bfxAPI.getAccountInfo(result1);
         cout << result1 << endl;
         cout << code << endl;
         ifs.close();

@@ -1,8 +1,18 @@
+
+//////////////////////////////////////////////////////////////////////////////
+// BitfinexAPI.cpp
+//////////////////////////////////////////////////////////////////////////////
+
+
+
 #include "BitfinexAPI.hpp"
 #include <iostream>
+#include <utility>
 #include <cryptopp/hmac.h>
 #include <cryptopp/osrng.h>
 #include <cryptopp/hex.h>
+#include <cryptopp/base64.h>
+
 
 
 using std::cout;
@@ -193,11 +203,65 @@ getSymbolDetails(string &result)
 
 
 //////////////////////////////////////////////////////////////////////////////
+// Authenticated endpoints
+//////////////////////////////////////////////////////////////////////////////
+
+
+int BitfinexAPI::
+getAccountInfo(string &result)
+{
+    
+    string endPoint = "/account_infos/";
+    string params = "{\"request\":\"/v1/account_infos\",\"nonce\":\"" + getTonce() + "\"}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
 // Support private methods
 //////////////////////////////////////////////////////////////////////////////
 
 
-// String to HMAC-SHA384
+string BitfinexAPI::
+getTonce()
+{
+
+    std::stringstream tonce;
+    
+    struct timeval start;
+    gettimeofday(&start, NULL);
+    tonce << start.tv_sec * 1000000LL + start.tv_usec;
+
+    return tonce.str();
+    
+}
+
+
+// String to Base64
+int BitfinexAPI::
+getBase64(const string &content, string &encoded)
+{
+    
+    using CryptoPP::StringSource;
+    using CryptoPP::Base64Encoder;
+    using CryptoPP::StringSink;
+    
+    byte buffer[1024] = {};
+    
+    for (int i = 0; i < content.length(); i++)
+    {
+        buffer[i] = content[i];
+    };
+    
+    StringSource ss(buffer, content.length(), true, new Base64Encoder( new StringSink(encoded), false));
+    
+    return 0;
+    
+}
+
+
+// String to HMAC-SHA384 hex digest
 int BitfinexAPI::
 getHmacSha384(const string &key, const string &content, string &digest)
 {
@@ -216,8 +280,10 @@ getHmacSha384(const string &key, const string &content, string &digest)
     HMAC<CryptoPP::SHA384> hmac(byteKey, byteKey.size());
     StringSource ss1(content, true, new HashFilter(hmac, new StringSink(mac)));
     StringSource ss2(mac, true, new HexEncoder(new StringSink(digest)));
+    std::transform(digest.begin(), digest.end(), digest.begin(), ::tolower);
     
     return 0;
+    
 }
 
 
@@ -276,14 +342,20 @@ DoPOSTrequest(const string &UrlEndPoint, const string &params, string &result)
     
     if(curl) {
         
+        string url = APIurl + UrlEndPoint;
+        string payload;
+        string signature;
+        getBase64(params, payload);
+        getHmacSha384(secretKey, payload, signature);
+        
         // Headers
         struct curl_slist *httpHeaders = NULL;
         httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-APIKEY:" + accessKey).c_str());
-        httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-PAYLOAD:" + accessKey).c_str());
+        httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-PAYLOAD:" + payload).c_str());
+        httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-SIGNATURE:" + signature).c_str());
+//        httpHeaders = curl_slist_append(httpHeaders, ("Expect:"));
         
-        
-        
-        string url = APIurl + UrlEndPoint;
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // debug option
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_POST, 1);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, httpHeaders);
