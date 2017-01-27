@@ -27,29 +27,43 @@ public:
     {
         curlERR = -50,
         badSymbol = -40,
-        badCurrency = -39
+        badCurrency = -39,
+        badDepositMethod = -38,
+        badWalletType = -38
     };
     
     // Constructor - destructor
     explicit BitfinexAPI(const string &accessKey, const string &secretKey);
     ~BitfinexAPI();
     
+    // Accessor
+    int getWithdrawalInfo();
+    int setWithdrawalInfo(const string param, const string value);
+    
     // Public endpoints
-    int getTicker(string &result, string symbol);
-    int getStats(string &result, string symbol);
-    int getFundingBook(string &result, string currency, int limit_bids = 50,
-                       int limit_asks = 50);
-    int getOrderBook(string &result, string symbol, int limit_bids = 50,
-                     int limit_asks = 50, bool group = 1);
-    int getTrades(string &result, string symbol, time_t since = 0,
-                  int limit_trades = 50);
-    int getLends(string &result, string currency, time_t since = 0,
-                 int limit_lends = 50);
+    int getTicker(string &result, const string symbol);
+    int getStats(string &result, const string symbol);
+    int getFundingBook(string &result, const string currency, const int limit_bids = 50,
+                       const int limit_asks = 50);
+    int getOrderBook(string &result, const string symbol,const int limit_bids = 50,
+                     const int limit_asks = 50, const bool group = 1);
+    int getTrades(string &result, const string symbol, const time_t since = 0,
+                  const int limit_trades = 50);
+    int getLends(string &result, const string currency, const time_t since = 0,
+                 const int limit_lends = 50);
     int getSymbols(string &result);
     int getSymbolDetails(string &result);
     
     // Authenticated endpoints
     int getAccountInfo(string &result);
+    int getSummary(string &result);
+    int deposit(string &result, const string method, const string walletType,
+                const bool renew = 0);
+    int getKeyPermissions(string &result);
+    int getMarginInfos(string &result);
+    int getBalances(string &result);
+    int transfer(string &result, const int amount, const string currency,
+                 const string walletfrom, string walletto);
     
     
     
@@ -60,9 +74,11 @@ private:
     BitfinexAPI &operator=(const BitfinexAPI&);
     
     // Private variables
-    string APIurl;
     vector<string> symbols; // possible symbol pairs
     vector<string> currencies; // possible currencies
+    vector<string> methods; // possible deposit methods
+    vector<string> walletTypes; // possible walletTypes
+    string APIurl;
     string accessKey, secretKey;
     CURL *curl;
     CURLcode res;

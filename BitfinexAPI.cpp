@@ -34,31 +34,25 @@ accessKey(accessKey), secretKey(secretKey), curl(NULL)
     APIurl = "https://api.bitfinex.com/v1";
     symbols = // to do: initialize symbols values from API symbols call.
     {
-        "btcusd",
-        "ltcusd",
-        "ltcbtc",
-        "ethusd",
-        "ethbtc",
-        "etcbtc",
-        "etcusd",
-        "bfxusd",
-        "bfxbtc",
-        "rrtusd",
-        "rrtbtc",
-        "zecusd",
-        "zecbtc",
-        "xmrusd",
-        "xmrbtc"
+        "btcusd", "ltcusd", "ltcbtc",
+        "ethusd", "ethbtc", "etcbtc",
+        "etcusd", "bfxusd", "bfxbtc",
+        "rrtusd", "rrtbtc", "zecusd",
+        "zecbtc", "xmrusd", "xmrbtc"
     };
     currencies =
     {
-        "usd",
-        "btc",
-        "eth",
-        "etc",
-        "bfx",
-        "zec",
-        "ltc"
+        "usd", "btc", "eth", "etc", "bfx", "zec", "ltc"
+    };
+    methods =
+    {
+        "bitcoin", "litecoin", "ethereum",
+        "mastercoin", "ethereumc", "zcash",
+        "monero"
+    };
+    walletTypes =
+    {
+        "trading", "exchange", "deposit"
     };
 }
 
@@ -138,7 +132,7 @@ getOrderBook(string &result, string symbol, int limit_bids, int limit_asks, bool
     string params =
     "?limit_bids=" + to_string(limit_bids) +
     "&limit_asks=" + to_string(limit_asks) +
-    "&group=" + to_string(limit_asks);
+    "&group=" + to_string(group);
     return DoGETrequest(endPoint, params, result);
     
 }
@@ -212,7 +206,115 @@ getAccountInfo(string &result)
 {
     
     string endPoint = "/account_infos/";
-    string params = "{\"request\":\"/v1/account_infos\",\"nonce\":\"" + getTonce() + "\"}";
+    string params = "{\"request\":\"/v1/account_infos\",\"nonce\":\"" + getTonce() + "\"";
+    params += "}";
+    
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getSummary(string &result)
+{
+    
+    string endPoint = "/summary/";
+    string params = "{\"request\":\"/v1/summary\",\"nonce\":\"" + getTonce() + "\"";
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+deposit(string &result, string method, string walletType, bool renew)
+{
+    
+    // Is deposit method valid ?
+    if(!inArray(method, methods))
+    {
+        return badDepositMethod;
+    }
+    // Is walletType valid ?
+    if(!inArray(walletType, walletTypes))
+    {
+        return badWalletType;
+    }
+    
+    string endPoint = "/deposit/new/";
+    string params = "{\"request\":\"/v1/deposit/new\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"method\":\"" + method + "\"";
+    params += ",\"wallet_name\":\"" + walletType + "\"";
+    params += ",\"renew\":" + to_string(renew);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getKeyPermissions(string &result)
+{
+    
+    string endPoint = "/key_info/";
+    string params = "{\"request\":\"/v1/key_info\",\"nonce\":\"" + getTonce() + "\"";
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getMarginInfos(string &result)
+{
+    
+    string endPoint = "/margin_infos/";
+    string params = "{\"request\":\"/v1/margin_infos\",\"nonce\":\"" + getTonce() + "\"";
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getBalances(string &result)
+{
+    
+    string endPoint = "/balances/";
+    string params = "{\"request\":\"/v1/balances\",\"nonce\":\"" + getTonce() + "\"";
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+transfer(string &result, int amount, string currency, string walletfrom, string walletto)
+{
+    
+    // Is currency valid ?
+    if(!inArray(currency, currencies))
+    {
+        return badCurrency;
+    }
+    // Is walletType valid ?
+    if(!inArray(walletfrom, walletTypes) || !inArray(walletto, walletTypes))
+    {
+        return badWalletType;
+    }
+    
+    
+    string endPoint = "/transfer/";
+    string params = "{\"request\":\"/v1/transfer\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"amount\":" + to_string(amount);
+    params += ",\"currency\":\"" + currency + "\"";
+    params += ",\"walletfrom\":\"" + walletfrom + "\"";
+    params += ",\"walletto\":\"" + walletto + "\"";
+    
+    params += "}";
     return DoPOSTrequest(endPoint, params, result);
     
 }
@@ -293,8 +395,10 @@ getHmacSha384(const string &key, const string &content, string &digest)
 size_t BitfinexAPI::
 WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
+    
     ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
+    
 }
 
 
@@ -353,16 +457,16 @@ DoPOSTrequest(const string &UrlEndPoint, const string &params, string &result)
         httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-APIKEY:" + accessKey).c_str());
         httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-PAYLOAD:" + payload).c_str());
         httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-SIGNATURE:" + signature).c_str());
-//        httpHeaders = curl_slist_append(httpHeaders, ("Expect:"));
         
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // debug option
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L); // debug option
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_POST, 1);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "\n");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, httpHeaders);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
         res = curl_easy_perform(curl);
-        
+        curl_slist_free_all(httpHeaders);
         // libcurl internal error handling
         if (res != CURLE_OK)
         {

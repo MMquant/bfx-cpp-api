@@ -14,7 +14,6 @@ using std::ifstream;
 using std::string;
 
 
-
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -36,7 +35,7 @@ int main(int argc, char* argv[])
         getline(ifs, secretKey);
         BitfinexAPI bfxAPI(accessKey, secretKey);
         string result1;
-        int code = bfxAPI.getAccountInfo(result1);
+        int code = bfxAPI.getTicker(result1, "btcusd");
         cout << result1 << endl;
         cout << code << endl;
         ifs.close();
