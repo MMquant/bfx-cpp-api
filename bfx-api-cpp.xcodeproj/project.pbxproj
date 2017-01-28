@@ -11,6 +11,7 @@
 		3096E79E1E37DFDE00F2C1B4 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3096E79D1E37DFDE00F2C1B4 /* libcurl.4.dylib */; };
 		30D3E03D1E392B6100550117 /* BitfinexAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30D3E03A1E392B6100550117 /* BitfinexAPI.cpp */; };
 		30D3E03E1E392B6100550117 /* console-wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30D3E03C1E392B6100550117 /* console-wrapper.cpp */; };
+		30D3E0461E3CEBAD00550117 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 30D3E0451E3CEBAD00550117 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +35,7 @@
 		30D3E03B1E392B6100550117 /* BitfinexAPI.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BitfinexAPI.hpp; sourceTree = "<group>"; };
 		30D3E03C1E392B6100550117 /* console-wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "console-wrapper.cpp"; sourceTree = "<group>"; };
 		30D3E0421E3B7ED700550117 /* withdraw.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = withdraw.conf; sourceTree = "<group>"; };
+		30D3E0451E3CEBAD00550117 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 		3096E7871E37DEAC00F2C1B4 = {
 			isa = PBXGroup;
 			children = (
+				30D3E0451E3CEBAD00550117 /* README.md */,
 				30D3E03A1E392B6100550117 /* BitfinexAPI.cpp */,
 				30D3E03B1E392B6100550117 /* BitfinexAPI.hpp */,
 				30D3E0421E3B7ED700550117 /* withdraw.conf */,
@@ -136,6 +139,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30D3E0461E3CEBAD00550117 /* README.md in Sources */,
 				30D3E03D1E392B6100550117 /* BitfinexAPI.cpp in Sources */,
 				30D3E03E1E392B6100550117 /* console-wrapper.cpp in Sources */,
 			);
