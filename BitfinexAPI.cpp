@@ -8,6 +8,9 @@
 #include "BitfinexAPI.hpp"
 #include <iostream>
 #include <utility>
+#include <map>
+#include <fstream>
+
 #include <cryptopp/hmac.h>
 #include <cryptopp/osrng.h>
 #include <cryptopp/hex.h>
@@ -32,6 +35,7 @@ accessKey(accessKey), secretKey(secretKey), curl(NULL)
 {
     curl = curl_easy_init();
     APIurl = "https://api.bitfinex.com/v1";
+    WDconfFilePath = "withdraw.conf";
     symbols = // to do: initialize symbols values from API symbols call.
     {
         "btcusd", "ltcusd", "ltcbtc",
@@ -323,6 +327,31 @@ transfer(string &result, int amount, string currency, string walletfrom, string 
 //////////////////////////////////////////////////////////////////////////////
 // Support private methods
 //////////////////////////////////////////////////////////////////////////////
+
+
+// Generates parameters for withdraw method
+string BitfinexAPI::
+parseWDconfParams()
+{
+ 
+    using std::map;
+    using std::getline;
+    using std::ifstream;
+    
+    string params;
+    string line;
+    ifstream inFile;
+    map<string, string> mParams;
+    inFile.open(WDconfFilePath);
+    while (getline(inFile, line)) {
+        
+        // Here be dragons
+        
+    }
+    
+    return params;
+    
+}
 
 
 string BitfinexAPI::

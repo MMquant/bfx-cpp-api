@@ -36,10 +36,6 @@ public:
     explicit BitfinexAPI(const string &accessKey, const string &secretKey);
     ~BitfinexAPI();
     
-    // Accessor
-    int getWithdrawalInfo();
-    int setWithdrawalInfo(const string param, const string value);
-    
     // Public endpoints
     int getTicker(string &result, const string symbol);
     int getStats(string &result, const string symbol);
@@ -64,8 +60,7 @@ public:
     int getBalances(string &result);
     int transfer(string &result, const int amount, const string currency,
                  const string walletfrom, string walletto);
-    
-    
+    int withdraw(); // configure withdraw.conf file before use
     
 private:
     
@@ -78,12 +73,14 @@ private:
     vector<string> currencies; // possible currencies
     vector<string> methods; // possible deposit methods
     vector<string> walletTypes; // possible walletTypes
-    string APIurl;
+    static string WDconfFilePath;
+    static string APIurl;
     string accessKey, secretKey;
     CURL *curl;
     CURLcode res;
     
     // Support private methods
+    static string parseWDconfParams();
     static string getTonce();
     static int getBase64(const string &content, string &base64);
     static int getHmacSha384(const string &key, const string &content, string &digest);

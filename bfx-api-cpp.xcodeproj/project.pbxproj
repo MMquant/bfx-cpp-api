@@ -33,6 +33,7 @@
 		30D3E03A1E392B6100550117 /* BitfinexAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BitfinexAPI.cpp; sourceTree = "<group>"; };
 		30D3E03B1E392B6100550117 /* BitfinexAPI.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BitfinexAPI.hpp; sourceTree = "<group>"; };
 		30D3E03C1E392B6100550117 /* console-wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "console-wrapper.cpp"; sourceTree = "<group>"; };
+		30D3E0421E3B7ED700550117 /* withdraw.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = withdraw.conf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +54,7 @@
 			children = (
 				30D3E03A1E392B6100550117 /* BitfinexAPI.cpp */,
 				30D3E03B1E392B6100550117 /* BitfinexAPI.hpp */,
+				30D3E0421E3B7ED700550117 /* withdraw.conf */,
 				30D3E03C1E392B6100550117 /* console-wrapper.cpp */,
 				302D3DAE1E38E51E00E3A3F1 /* .gitignore */,
 				3096E7911E37DEAC00F2C1B4 /* Products */,
