@@ -10,6 +10,7 @@
 #include <utility>
 #include <map>
 #include <fstream>
+#include <regex>
 
 #include <cryptopp/hmac.h>
 #include <cryptopp/osrng.h>
@@ -46,7 +47,7 @@ accessKey(accessKey), secretKey(secretKey), curl(NULL)
     };
     currencies =
     {
-        "usd", "btc", "eth", "etc", "bfx", "zec", "ltc"
+        "USD", "BTC", "ETH", "ETC", "BFX", "ZEC", "LTC"
     };
     methods =
     {
@@ -295,7 +296,7 @@ getBalances(string &result)
 
 
 int BitfinexAPI::
-transfer(string &result, int amount, string currency, string walletfrom, string walletto)
+transfer(string &result, double amount, string currency, string walletfrom, string walletto)
 {
     
     // Is currency valid ?
@@ -313,10 +314,27 @@ transfer(string &result, int amount, string currency, string walletfrom, string 
     string endPoint = "/transfer/";
     string params = "{\"request\":\"/v1/transfer\",\"nonce\":\"" + getTonce() + "\"";
     
-    params += ",\"amount\":" + to_string(amount);
+    params += ",\"amount\":\"" + to_string(amount) + "\"";
     params += ",\"currency\":\"" + currency + "\"";
     params += ",\"walletfrom\":\"" + walletfrom + "\"";
     params += ",\"walletto\":\"" + walletto + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+withdraw(string &result)
+{
+    
+    string endPoint = "/withdraw/";
+    string params = "{\"request\":\"/v1/withdraw\",\"nonce\":\"" + getTonce() + "\"";
+    
+    // Add params from withdraw.conf
+    int err = parseWDconfParams(params);
+    if (err != 0) { return err ;};
     
     params += "}";
     return DoPOSTrequest(endPoint, params, result);
@@ -330,30 +348,80 @@ transfer(string &result, int amount, string currency, string walletfrom, string 
 
 
 // Generates parameters for withdraw method
-string BitfinexAPI::
-parseWDconfParams()
+int BitfinexAPI::
+parseWDconfParams(string &params)
 {
- 
+    
     using std::map;
     using std::getline;
     using std::ifstream;
+    using std::regex;
+    using std::smatch;
+    using std::regex_search;
     
-    string params;
     string line;
     ifstream inFile;
     map<string, string> mParams;
     inFile.open(WDconfFilePath);
+    regex rgx("^(.*)\\b\\s*=\\s*(\"{0,1}.*\"{0,1})$");
+    smatch match;
+    
+    // Create map with parameters
     while (getline(inFile, line)) {
         
-        // Here be dragons
+        // Skip comments, blank lines ...
+        if (isalpha(line[0]))
+        {
+            // ... and keys with empty values
+            if (regex_search(line, match, rgx) && match[2] != "\"\"")
+                mParams.emplace(match[1], match[2]);
+        }
         
     }
     
-    return params;
+    // Check parameters
+    if (!mParams.count("withdraw_type") ||
+        !mParams.count("walletselected") ||
+        !mParams.count("amount"))
+    {
+        return requiredParamsMissing;
+    }
+    
+    if (mParams["withdraw_type"] == "wire")
+    {
+        if (!mParams.count("account_number") ||
+            !mParams.count("bank_name") ||
+            !mParams.count("bank_address") ||
+            !mParams.count("bank_city") ||
+            !mParams.count("bank_country"))
+        {
+            return wireParamsMissing;
+        }
+    }
+    else if (inArray(mParams["withdraw_type"], methods))
+    {
+        if(!mParams.count("address"))
+        {
+            return addressParamsMissing;
+        }
+    }
+    
+    // Create JSON string
+    
+    for (const auto &param : mParams)
+    {
+        params += ",\"";
+        params += param.first;
+        params += "\":";
+        params += param.second;
+    }
+    
+    return 0;
     
 }
 
 
+// Tonce
 string BitfinexAPI::
 getTonce()
 {
@@ -403,6 +471,7 @@ getHmacSha384(const string &key, const string &content, string &digest)
     using CryptoPP::StringSink;
     using CryptoPP::HMAC;
     using CryptoPP::HashFilter;
+    using std::transform;
     
     SecByteBlock byteKey((const byte*)key.data(), key.size());
     string mac;
@@ -411,7 +480,7 @@ getHmacSha384(const string &key, const string &content, string &digest)
     HMAC<CryptoPP::SHA384> hmac(byteKey, byteKey.size());
     StringSource ss1(content, true, new HashFilter(hmac, new StringSink(mac)));
     StringSource ss2(mac, true, new HexEncoder(new StringSink(digest)));
-    std::transform(digest.begin(), digest.end(), digest.begin(), ::tolower);
+    transform(digest.begin(), digest.end(), digest.begin(), ::tolower);
     
     return 0;
     

@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
         getline(ifs, secretKey);
         BitfinexAPI bfxAPI(accessKey, secretKey);
         string result1;
-        int code = bfxAPI.getTicker(result1, "btcusd");
+        bfxAPI.setWDconfFilePath("/Users/jvr23/Documents/CPP/bfx-api-cpp/withdraw.conf");
+        int code = bfxAPI.withdraw(result1);
         cout << result1 << endl;
         cout << code << endl;
         ifs.close();

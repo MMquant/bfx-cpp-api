@@ -11,7 +11,6 @@
 		3096E79E1E37DFDE00F2C1B4 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3096E79D1E37DFDE00F2C1B4 /* libcurl.4.dylib */; };
 		30D3E03D1E392B6100550117 /* BitfinexAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30D3E03A1E392B6100550117 /* BitfinexAPI.cpp */; };
 		30D3E03E1E392B6100550117 /* console-wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30D3E03C1E392B6100550117 /* console-wrapper.cpp */; };
-		30D3E0461E3CEBAD00550117 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 30D3E0451E3CEBAD00550117 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -139,7 +138,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30D3E0461E3CEBAD00550117 /* README.md in Sources */,
 				30D3E03D1E392B6100550117 /* BitfinexAPI.cpp in Sources */,
 				30D3E03E1E392B6100550117 /* console-wrapper.cpp in Sources */,
 			);

@@ -29,12 +29,19 @@ public:
         badSymbol = -40,
         badCurrency = -39,
         badDepositMethod = -38,
-        badWalletType = -38
+        badWalletType = -37,
+        requiredParamsMissing = -36,
+        wireParamsMissing = -35,
+        addressParamsMissing = -34
     };
     
     // Constructor - destructor
     explicit BitfinexAPI(const string &accessKey, const string &secretKey);
     ~BitfinexAPI();
+    
+    // Accessors
+    string getWDconfFilePath() const { return WDconfFilePath; }
+    void setWDconfFilePath(const string &path) { WDconfFilePath = path; }
     
     // Public endpoints
     int getTicker(string &result, const string symbol);
@@ -58,9 +65,9 @@ public:
     int getKeyPermissions(string &result);
     int getMarginInfos(string &result);
     int getBalances(string &result);
-    int transfer(string &result, const int amount, const string currency,
+    int transfer(string &result, const double amount, const string currency,
                  const string walletfrom, string walletto);
-    int withdraw(); // configure withdraw.conf file before use
+    int withdraw(string &result); // configure withdraw.conf file before use
     
 private:
     
@@ -73,14 +80,14 @@ private:
     vector<string> currencies; // possible currencies
     vector<string> methods; // possible deposit methods
     vector<string> walletTypes; // possible walletTypes
-    static string WDconfFilePath;
-    static string APIurl;
+    string WDconfFilePath;
+    string APIurl;
     string accessKey, secretKey;
     CURL *curl;
     CURLcode res;
     
     // Support private methods
-    static string parseWDconfParams();
+    int parseWDconfParams(string &params);
     static string getTonce();
     static int getBase64(const string &content, string &base64);
     static int getHmacSha384(const string &key, const string &content, string &digest);
