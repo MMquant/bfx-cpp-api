@@ -1,6 +1,27 @@
 
 //////////////////////////////////////////////////////////////////////////////
-// BitfinexAPI.cpp
+//                                                                          
+//  BitfinexAPI.cpp
+//
+//
+//  Bitfinex REST API C++ client
+//
+//
+//  Copyright (C) 2017      Petr Javorik    maple@mmquant.net
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -569,10 +590,237 @@ claimPosition(string &result, long &position_id, const double &amount)
 }
 
 
+int BitfinexAPI::
+getBalanceHistory(string &result, const string &currency, const time_t &since,
+                      const time_t &until, const int &limit, const string &walletType)
+{
+    
+    // Is currency valid ?
+    if(!inArray(currency, currencies))
+    {
+        return badCurrency;
+    }
+    // Is wallet type valid ?
+    // Modified condition which accepts "all" value for all wallets balances together.
+    if(!inArray(walletType, walletTypes) && walletType != "all")
+    {
+        return badWalletType;
+    }
+    
+    string endPoint = "/history/";
+    string params = "{\"request\":\"/v1/history\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"currency\":\"" + currency + "\"";
+    params += ",\"since\":\"" + to_string(since) + "\"";
+    params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
+    params += ",\"limit\":" + to_string(limit);
+    if (walletType != "all")
+    {
+        params += ",\"wallet\":\"" + walletType + "\"";
+    }
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getDWHistory(string &result, const string &currency, const string &method,
+                 const time_t &since, const time_t &until, const int &limit)
+{
+    
+    // Is currency valid ?
+    if(!inArray(currency, currencies))
+    {
+        return badCurrency;
+    }
+    // Is deposit method valid ?
+    if(!inArray(method, methods) && method != "wire")
+    {
+        return badDepositMethod;
+    }
+    
+    string endPoint = "/history/movements/";
+    string params = "{\"request\":\"/v1/history/movements\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"currency\":\"" + currency + "\"";
+    params += ",\"method\":\"" + method + "\"";
+    params += ",\"since\":\"" + to_string(since) + "\"";
+    params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
+    params += ",\"limit\":" + to_string(limit);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getPastTrades(string &result, const string &symbol, const time_t &timestamp,
+                  const time_t &until, const int &limit_trades, const bool reverse)
+{
+
+    // Is symbol valid ?
+    if(!inArray(symbol, symbols))
+    {
+        return badSymbol;
+    }
+    
+    string endPoint = "/mytrades/";
+    string params = "{\"request\":\"/v1/mytrades\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"symbol\":\"" + symbol + "\"";
+    params += ",\"timestamp\":\"" + to_string(timestamp) + "\"";
+    params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
+    params += ",\"limit_trades\":" + to_string(limit_trades);
+    params += ",\"reverse\":" + to_string(reverse);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+newOffer(string &result, const string &currency, const double &amount,
+             const float &rate, const int &period, const string &direction)
+{
+ 
+    // Is currency valid ?
+    if(!inArray(currency, currencies))
+    {
+        return badCurrency;
+    }
+    
+    string endPoint = "/offer/new/";
+    string params = "{\"request\":\"/v1/offer/new\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"currency\":\"" + currency + "\"";
+    params += ",\"amount\":\"" + to_string(amount) + "\"";
+    params += ",\"rate\":\"" + to_string(rate) + "\"";
+    params += ",\"period\":" + to_string(period);
+    params += ",\"direction\":\"" + direction + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+cancelOffer(string &result, const long long &offer_id)
+{
+
+    string endPoint = "/offer/cancel/";
+    string params = "{\"request\":\"/v1/offer/cancel\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"offer_id\":" + to_string(offer_id);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getOfferStatus(string &result, const long long &offer_id)
+{
+    
+    string endPoint = "/offer/status/";
+    string params = "{\"request\":\"/v1/offer/status\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"offer_id\":" + to_string(offer_id);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getActiveCredits(string &result)
+{
+    
+    string endPoint = "/credits/";
+    string params = "{\"request\":\"/v1/credits\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getOffers(string &result)
+{
+    
+    string endPoint = "/offers/";
+    string params = "{\"request\":\"/v1/offers\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getTakenFunds(string &result)
+{
+    
+    string endPoint = "/taken_funds/";
+    string params = "{\"request\":\"/v1/taken_funds\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getUnusedTakenFunds(string &result)
+{
+    
+    string endPoint = "/unused_taken_funds/";
+    string params = "{\"request\":\"/v1/unused_taken_funds\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getTotalTakenFunds(string &result)
+{
+    
+    string endPoint = "/total_taken_funds/";
+    string params = "{\"request\":\"/v1/total_taken_funds\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+closeLoan(string &result, const long long &swap_id)
+{
+    
+    string endPoint = "/funding/close/";
+    string params = "{\"request\":\"/v1/funding/close\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"swap_id\":" + to_string(swap_id);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
 
 
 //////////////////////////////////////////////////////////////////////////////
-// Support private methods
+// Utility private methods
 //////////////////////////////////////////////////////////////////////////////
 
 

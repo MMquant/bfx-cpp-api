@@ -37,20 +37,13 @@ int main(int argc, char* argv[])
         string result1, result2;
         
         
-        vector<BitfinexAPI::sOrders> vOrders =
-        {
-            {"btcusd", 0.02, 1000, "sell", "exchange limit"},
-            {"btcusd", 0.03, 1001, "sell", "exchange limit"},
-            {"btcusd", 0.04, 1002, "sell", "exchange limit"},
-        };
-        bfxAPI.newOrders(result1, vOrders);
-        
 
-//        bfxAPI.newOrder(result1, "btcusd", 0.012, 1000, "sell", "exchange limit");
+        int code = bfxAPI.newOffer(result1, "BTC", 0.0195, 250, 2, "lend");
         
         
         
         cout << result1 << endl;
+        cout << code << endl;
         ifs.close();
         return 0;
     }

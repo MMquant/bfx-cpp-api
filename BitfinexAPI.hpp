@@ -53,8 +53,6 @@ public:
     // Accessors
     string getWDconfFilePath() const { return WDconfFilePath; }
     void setWDconfFilePath(const string &path) { WDconfFilePath = path; }
-//    vector<sOrders> getNewOrders() const { return vOrders; } //////// erase
-//    void setNewOrders(const vector<sOrders> &vOrdersIn) { vOrders = vOrdersIn; } //////// erase
     
     //  Public endpoints
     int getTicker(string &result, const string &symbol);
@@ -102,8 +100,26 @@ public:
     int getActivePositions(string &result);
     int claimPosition(string &result, long &position_id, const double &amount);
     //  Historical data
-    
-    
+    int getBalanceHistory(string &result, const string &currency, const time_t &since = 0,
+                          const time_t &until = 0, const int &limit = 500,
+                          const string &walletType = "all");
+    int getDWHistory(string &result, const string &currency, const string &method,
+                     const time_t &since = 0 , const time_t &until = 0,
+                     const int &limit = 500);
+    int getPastTrades(string &result, const string &symbol, const time_t &timestamp,
+                      const time_t &until = 0, const int &limit_trades = 500,
+                      const bool reverse = 0);
+    //  Margin funding
+    int newOffer(string &result, const string &currency, const double &amount,
+                 const float &rate, const int &period, const string &direction);
+    int cancelOffer(string &result, const long long &offer_id);
+    int getOfferStatus(string &result, const long long &offer_id);
+    int getActiveCredits(string &result);
+    int getOffers(string &result);
+    int getTakenFunds(string &result);
+    int getUnusedTakenFunds(string &result);
+    int getTotalTakenFunds(string &result);
+    int closeLoan(string &result, const long long &offer_id);
     
 private:
     
@@ -117,14 +133,13 @@ private:
     vector<string> methods; // possible deposit methods
     vector<string> walletTypes; // possible walletTypes
     vector<string> types; // possible Types (see new order endpoint)
-//    vector<sOrders> vOrders; // vector with parameters for newOrders method //////// erase
     string WDconfFilePath;
     string APIurl;
     string accessKey, secretKey;
     CURL *curl;
     CURLcode res;
     
-    // Support private methods
+    // Utility private methods
     int parseWDconfParams(string &params);
     static string bool2string(const bool &in);
     static string getTonce();
