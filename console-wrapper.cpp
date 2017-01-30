@@ -35,8 +35,15 @@ int main(int argc, char* argv[])
         getline(ifs, secretKey);
         BitfinexAPI bfxAPI(accessKey, secretKey);
         string result1;
-        bfxAPI.setWDconfFilePath("/Users/jvr23/Documents/CPP/bfx-api-cpp/withdraw.conf");
-        int code = bfxAPI.withdraw(result1);
+        
+        vector<BitfinexAPI::sOrders> vOrders =
+        {
+            {"btcusd", 0.02, 1000, "sell", "exchange limit"},
+            {"btcusd", 0.03, 1001, "sell", "exchange limit"},
+            {"btcusd", 0.04, 1002, "sell", "exchange limit"},
+        };
+        
+        int code = bfxAPI.newOrders(result1, vOrders);
         cout << result1 << endl;
         cout << code << endl;
         ifs.close();

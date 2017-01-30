@@ -37,7 +37,7 @@ accessKey(accessKey), secretKey(secretKey), curl(NULL)
     curl = curl_easy_init();
     APIurl = "https://api.bitfinex.com/v1";
     WDconfFilePath = "withdraw.conf";
-    symbols = // to do: initialize symbols values from API symbols call.
+    symbols =
     {
         "btcusd", "ltcusd", "ltcbtc",
         "ethusd", "ethbtc", "etcbtc",
@@ -58,6 +58,13 @@ accessKey(accessKey), secretKey(secretKey), curl(NULL)
     walletTypes =
     {
         "trading", "exchange", "deposit"
+    };
+    // New order endpoint "type" parameter
+    types =
+    {
+        "market","limit", "stop", "trailing-stop", "fill-or-kill",
+        "exchange market", "exchange limit", "exchange stop",
+        "exchange trailing-stop", "exchange fill-or-kill"
     };
 }
 
@@ -310,7 +317,6 @@ transfer(string &result, double amount, string currency, string walletfrom, stri
         return badWalletType;
     }
     
-    
     string endPoint = "/transfer/";
     string params = "{\"request\":\"/v1/transfer\",\"nonce\":\"" + getTonce() + "\"";
     
@@ -339,6 +345,76 @@ withdraw(string &result)
     params += "}";
     return DoPOSTrequest(endPoint, params, result);
     
+}
+
+
+int BitfinexAPI::
+newOrder(string &result, const string symbol, const double amount,
+         const double price, const string side, const string type,
+         const bool is_hidden, const bool is_postonly,
+         const bool use_all_available, const bool ocoorder,
+         const double buy_price_oco)
+{
+    
+    // Is symbol valid ?
+    if(!inArray(symbol, symbols))
+    {
+        return badSymbol;
+    }
+    // Is order type valid ?
+    if(!inArray(type, types))
+    {
+        return badOrderType;
+    }
+    
+    string endPoint = "/order/new/";
+    string params = "{\"request\":\"/v1/order/new\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"symbol\":\"" + symbol + "\"";
+    params += ",\"amount\":\"" + to_string(amount) + "\"";
+    params += ",\"price\":\"" + to_string(price) + "\"";
+    params += ",\"side\":\"" + side + "\"";
+    params += ",\"type\":\"" + type + "\"";
+    params += ",\"is_hidden\":" + bool2string(is_hidden);
+    params += ",\"is_postonly\":" + bool2string(is_postonly);
+    params += ",\"use_all_available\":" + bool2string(use_all_available);
+    params += ",\"ocoorder\":" + bool2string(ocoorder);
+    params += ",\"buy_price_oco\":" + bool2string(buy_price_oco);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+newOrders(string &result, const vector<sOrders> &vOrders)
+{
+    
+    string endPoint = "/order/new/multi/";
+    string params = "{\"request\":\"/v1/order/new/multi\",\"nonce\":\"" + getTonce() + "\"";
+    
+    // Get pointer to last element in vOrders. We will not place
+    // ',' character at the end of the last loop.
+    auto &last = *(--vOrders.end());
+    
+    params += ",[";
+    for (const auto &order : vOrders)
+    {
+        params += "{\"symbol\":\"" + order.symbol + "\"";
+        params += ",\"amount\":\"" + to_string(order.amount) + "\"";
+        params += ",\"price\":\"" + to_string(order.price) + "\"";
+        params += ",\"side\":\"" + order.side + "\"";
+        params += ",\"type\":\"" + order.type + "\"}";
+        if (&order != &last)
+        {
+            params += ",";
+        }
+    }
+    params += "]";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
 }
 
 
@@ -418,6 +494,14 @@ parseWDconfParams(string &params)
     
     return 0;
     
+}
+
+
+// bool to string cast
+string BitfinexAPI::
+bool2string(const bool &in)
+{
+    return in ? "true" : "false";
 }
 
 

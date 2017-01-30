@@ -32,7 +32,18 @@ public:
         badWalletType = -37,
         requiredParamsMissing = -36,
         wireParamsMissing = -35,
-        addressParamsMissing = -34
+        addressParamsMissing = -34,
+        badOrderType = -33
+    };
+    
+    // Structure for multiple new orders endpoint
+    struct sOrders
+    {
+        string symbol;
+        double amount;
+        double price;
+        string side;
+        string type;
     };
     
     // Constructor - destructor
@@ -42,6 +53,8 @@ public:
     // Accessors
     string getWDconfFilePath() const { return WDconfFilePath; }
     void setWDconfFilePath(const string &path) { WDconfFilePath = path; }
+    vector<sOrders> getNewOrders() const { return vOrders; }
+    void setNewOrders(const vector<sOrders> &vOrdersIn) { vOrders = vOrdersIn; }
     
     // Public endpoints
     int getTicker(string &result, const string symbol);
@@ -66,8 +79,14 @@ public:
     int getMarginInfos(string &result);
     int getBalances(string &result);
     int transfer(string &result, const double amount, const string currency,
-                 const string walletfrom, string walletto);
+                 const string walletfrom, const string walletto);
     int withdraw(string &result); // configure withdraw.conf file before use
+    int newOrder(string &result, const string symbol, const double amount,
+                 const double price, const string side, const string type,
+                 const bool is_hidden = 0, const bool is_postonly = 0,
+                 const bool use_all_available = 0, const bool ocoorder = 0,
+                 const double buy_price_oco = 0);
+    int newOrders(string &result, const vector<struct sOrders> &vOrders);
     
 private:
     
@@ -80,6 +99,8 @@ private:
     vector<string> currencies; // possible currencies
     vector<string> methods; // possible deposit methods
     vector<string> walletTypes; // possible walletTypes
+    vector<string> types; // possible Types (see new order endpoint)
+    vector<sOrders> vOrders; // vector with parameters for newOrders method
     string WDconfFilePath;
     string APIurl;
     string accessKey, secretKey;
@@ -88,6 +109,7 @@ private:
     
     // Support private methods
     int parseWDconfParams(string &params);
+    static string bool2string(const bool &in);
     static string getTonce();
     static int getBase64(const string &content, string &base64);
     static int getHmacSha384(const string &key, const string &content, string &digest);
