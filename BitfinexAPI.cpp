@@ -399,7 +399,7 @@ newOrders(string &result, const vector<sOrders> &vOrders)
     // ',' character at the end of the last loop.
     auto &last = *(--vOrders.end());
     
-    params += ",[";
+    params += ",\"payload\":[";
     for (const auto &order : vOrders)
     {
         params += "{\"symbol\":\"" + order.symbol + "\"";
