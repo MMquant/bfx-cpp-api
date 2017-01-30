@@ -37,7 +37,7 @@ public:
     };
     
     // Structure for multiple new orders endpoint
-    struct sOrders
+    struct sOrder
     {
         string symbol;
         double amount;
@@ -45,6 +45,7 @@ public:
         string side;
         string type;
     };
+    typedef vector<sOrder> vOrders;
     
     // Constructor - destructor
     explicit BitfinexAPI(const string &accessKey, const string &secretKey);
@@ -86,7 +87,7 @@ public:
                  const bool &is_hidden = 0, const bool &is_postonly = 0,
                  const bool &use_all_available = 0, const bool &ocoorder = 0,
                  const double &buy_price_oco = 0);
-    int newOrders(string &result, const vector<struct sOrders> &vOrders);
+    int newOrders(string &result, const vOrders &orders);
     int cancelOrder(string &result, const long long &order_id);
     int cancelOrders(string &result, const vector<long long> &vOrder_ids);
     int cancelAllOrders(string &result);

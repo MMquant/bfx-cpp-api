@@ -32,6 +32,7 @@
 #include <map>
 #include <fstream>
 #include <regex>
+#include <chrono>
 
 #include <cryptopp/hmac.h>
 #include <cryptopp/osrng.h>
@@ -410,18 +411,18 @@ newOrder(string &result, const string &symbol, const double &amount,
 
 
 int BitfinexAPI::
-newOrders(string &result, const vector<sOrders> &vOrders)
+newOrders(string &result, const vOrders &orders)
 {
     
     string endPoint = "/order/new/multi/";
     string params = "{\"request\":\"/v1/order/new/multi\",\"nonce\":\"" + getTonce() + "\"";
     
-    // Get pointer to last element in vOrders. We will not place
+    // Get pointer to last element in orders. We will not place
     // ',' character at the end of the last loop.
-    auto &last = *(--vOrders.end());
+    auto &last = *(--orders.end());
     
     params += ",\"payload\":[";
-    for (const auto &order : vOrders)
+    for (const auto &order : orders)
     {
         params += "{\"symbol\":\"" + order.symbol + "\"";
         params += ",\"amount\":\"" + to_string(order.amount) + "\"";
@@ -911,13 +912,11 @@ string BitfinexAPI::
 getTonce()
 {
 
-    std::stringstream tonce;
+    using namespace std::chrono;
     
-    struct timeval start;
-    gettimeofday(&start, NULL);
-    tonce << start.tv_sec * 1000000LL + start.tv_usec;
+    milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
-    return tonce.str();
+    return to_string(ms.count());
     
 }
 
