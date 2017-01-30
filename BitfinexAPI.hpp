@@ -53,40 +53,57 @@ public:
     // Accessors
     string getWDconfFilePath() const { return WDconfFilePath; }
     void setWDconfFilePath(const string &path) { WDconfFilePath = path; }
-    vector<sOrders> getNewOrders() const { return vOrders; }
-    void setNewOrders(const vector<sOrders> &vOrdersIn) { vOrders = vOrdersIn; }
+//    vector<sOrders> getNewOrders() const { return vOrders; } //////// erase
+//    void setNewOrders(const vector<sOrders> &vOrdersIn) { vOrders = vOrdersIn; } //////// erase
     
-    // Public endpoints
-    int getTicker(string &result, const string symbol);
-    int getStats(string &result, const string symbol);
-    int getFundingBook(string &result, const string currency, const int limit_bids = 50,
-                       const int limit_asks = 50);
-    int getOrderBook(string &result, const string symbol,const int limit_bids = 50,
-                     const int limit_asks = 50, const bool group = 1);
-    int getTrades(string &result, const string symbol, const time_t since = 0,
-                  const int limit_trades = 50);
-    int getLends(string &result, const string currency, const time_t since = 0,
-                 const int limit_lends = 50);
+    //  Public endpoints
+    int getTicker(string &result, const string &symbol);
+    int getStats(string &result, const string &symbol);
+    int getFundingBook(string &result, const string &currency, const int &limit_bids = 50,
+                       const int &limit_asks = 50);
+    int getOrderBook(string &result, const string &symbol, const int &limit_bids = 50,
+                     const int &limit_asks = 50, const bool &group = 1);
+    int getTrades(string &result, const string &symbol, const time_t &since = 0,
+                  const int &limit_trades = 50);
+    int getLends(string &result, const string &currency, const time_t &since = 0,
+                 const int &limit_lends = 50);
     int getSymbols(string &result);
     int getSymbolDetails(string &result);
     
-    // Authenticated endpoints
+    /// Authenticated endpoints ///
+    //  Account
     int getAccountInfo(string &result);
     int getSummary(string &result);
-    int deposit(string &result, const string method, const string walletType,
-                const bool renew = 0);
+    int deposit(string &result, const string &method, const string &walletType,
+                const bool &renew = 0);
     int getKeyPermissions(string &result);
     int getMarginInfos(string &result);
     int getBalances(string &result);
-    int transfer(string &result, const double amount, const string currency,
-                 const string walletfrom, const string walletto);
+    int transfer(string &result, const double &amount, const string &currency,
+                 const string &walletfrom, const string &walletto);
     int withdraw(string &result); // configure withdraw.conf file before use
-    int newOrder(string &result, const string symbol, const double amount,
-                 const double price, const string side, const string type,
-                 const bool is_hidden = 0, const bool is_postonly = 0,
-                 const bool use_all_available = 0, const bool ocoorder = 0,
-                 const double buy_price_oco = 0);
+    //  Orders
+    int newOrder(string &result, const string &symbol, const double &amount,
+                 const double &price, const string &side, const string &type,
+                 const bool &is_hidden = 0, const bool &is_postonly = 0,
+                 const bool &use_all_available = 0, const bool &ocoorder = 0,
+                 const double &buy_price_oco = 0);
     int newOrders(string &result, const vector<struct sOrders> &vOrders);
+    int cancelOrder(string &result, const long long &order_id);
+    int cancelOrders(string &result, const vector<long long> &vOrder_ids);
+    int cancelAllOrders(string &result);
+    int replaceOrder(string &result, const long long &order_id, const string &symbol,
+                     const double &amount, const double &price, const string &side,
+                     const string &type, const bool &is_hidden = 0,
+                     const bool &use_remaining = 0);
+    int getOrderStatus(string &result, const long long &order_id);
+    int getActiveOrders(string &result);
+    //  Positions
+    int getActivePositions(string &result);
+    int claimPosition(string &result, long &position_id, const double &amount);
+    //  Historical data
+    
+    
     
 private:
     
@@ -100,7 +117,7 @@ private:
     vector<string> methods; // possible deposit methods
     vector<string> walletTypes; // possible walletTypes
     vector<string> types; // possible Types (see new order endpoint)
-    vector<sOrders> vOrders; // vector with parameters for newOrders method
+//    vector<sOrders> vOrders; // vector with parameters for newOrders method //////// erase
     string WDconfFilePath;
     string APIurl;
     string accessKey, secretKey;

@@ -82,7 +82,7 @@ BitfinexAPI::
 
 
 int BitfinexAPI::
-getTicker(string &result, string symbol)
+getTicker(string &result, const string &symbol)
 {
     
     // Is symbol valid ?
@@ -98,7 +98,7 @@ getTicker(string &result, string symbol)
 
 
 int BitfinexAPI::
-getStats(string &result, string symbol)
+getStats(string &result, const string &symbol)
 {
     
     // Is symbol valid ?
@@ -114,7 +114,7 @@ getStats(string &result, string symbol)
 
 
 int BitfinexAPI::
-getFundingBook(string &result, string currency, int limit_bids, int limit_asks)
+getFundingBook(string &result, const string &currency, const int &limit_bids, const int &limit_asks)
 {
     
     // Is currency valid ?
@@ -132,7 +132,7 @@ getFundingBook(string &result, string currency, int limit_bids, int limit_asks)
 
 
 int BitfinexAPI::
-getOrderBook(string &result, string symbol, int limit_bids, int limit_asks, bool group)
+getOrderBook(string &result, const string &symbol, const int &limit_bids, const int &limit_asks, const bool &group)
 {
     
     // Is symbol valid ?
@@ -151,7 +151,7 @@ getOrderBook(string &result, string symbol, int limit_bids, int limit_asks, bool
 
 
 int BitfinexAPI::
-getTrades(string &result, string symbol, time_t since, int limit_trades)
+getTrades(string &result, const string &symbol, const time_t &since, const int &limit_trades)
 {
     
     // Is symbol valid ?
@@ -169,7 +169,7 @@ getTrades(string &result, string symbol, time_t since, int limit_trades)
 
 
 int BitfinexAPI::
-getLends(string &result, string currency, time_t since, int limit_lends)
+getLends(string &result, const string &currency, const time_t &since, const int &limit_lends)
 {
     
     // Is currency valid ?
@@ -239,7 +239,7 @@ getSummary(string &result)
 
 
 int BitfinexAPI::
-deposit(string &result, string method, string walletType, bool renew)
+deposit(string &result, const string &method, const string &walletType, const bool &renew)
 {
     
     // Is deposit method valid ?
@@ -303,7 +303,8 @@ getBalances(string &result)
 
 
 int BitfinexAPI::
-transfer(string &result, double amount, string currency, string walletfrom, string walletto)
+transfer(string &result, const double &amount, const string &currency, const string &walletfrom,
+         const string &walletto)
 {
     
     // Is currency valid ?
@@ -349,11 +350,11 @@ withdraw(string &result)
 
 
 int BitfinexAPI::
-newOrder(string &result, const string symbol, const double amount,
-         const double price, const string side, const string type,
-         const bool is_hidden, const bool is_postonly,
-         const bool use_all_available, const bool ocoorder,
-         const double buy_price_oco)
+newOrder(string &result, const string &symbol, const double &amount,
+         const double &price, const string &side, const string &type,
+         const bool &is_hidden, const bool &is_postonly,
+         const bool &use_all_available, const bool &ocoorder,
+         const double &buy_price_oco)
 {
     
     // Is symbol valid ?
@@ -415,7 +416,159 @@ newOrders(string &result, const vector<sOrders> &vOrders)
     
     params += "}";
     return DoPOSTrequest(endPoint, params, result);
+    
 }
+
+
+int BitfinexAPI::
+cancelOrder(string &result, const long long &order_id)
+{
+    
+    string endPoint = "/order/cancel/";
+    string params = "{\"request\":\"/v1/order/cancel\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"order_id\":" + to_string(order_id);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+cancelOrders(string &result, const vector<long long> &vOrder_ids)
+{
+    
+    string endPoint = "/order/cancel/multi/";
+    string params = "{\"request\":\"/v1/order/cancel/multi\",\"nonce\":\"" + getTonce() + "\"";
+    
+    // Get pointer to last element in vOrders. We will not place
+    // ',' character at the end of the last loop.
+    auto &last = *(--vOrder_ids.end());
+    
+    params += ", \"order_ids\":[";
+    for (const auto &order_id : vOrder_ids)
+    {
+        params += to_string(order_id);
+        if (&order_id != &last)
+        {
+            params += ",";
+        }
+    }
+    params += "]";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+cancelAllOrders(string &result)
+{
+    
+    string endPoint = "/order/cancel/all/";
+    string params = "{\"request\":\"/v1/order/cancel/all\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+replaceOrder(string &result, const long long &order_id, const string &symbol,
+                 const double &amount, const double &price, const string &side,
+                 const string &type, const bool &is_hidden,
+                 const bool &use_remaining)
+{
+    
+    // Is symbol valid ?
+    if(!inArray(symbol, symbols))
+    {
+        return badSymbol;
+    }
+    // Is order type valid ?
+    if(!inArray(type, types))
+    {
+        return badOrderType;
+    }
+    
+    string endPoint = "/order/cancel/replace/";
+    string params = "{\"request\":\"/v1/order/cancel/replace\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"order_id\":" + to_string(order_id);
+    params += ",\"symbol\":\"" + symbol + "\"";
+    params += ",\"amount\":\"" + to_string(amount) + "\"";
+    params += ",\"price\":\"" + to_string(price) + "\"";
+    params += ",\"side\":\"" + side + "\"";
+    params += ",\"type\":\"" + type + "\"";
+    params += ",\"is_hidden\":" + bool2string(is_hidden);
+    params += ",\"use_all_available\":" + bool2string(use_remaining);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getOrderStatus(string &result, const long long &order_id)
+{
+    
+    string endPoint = "/order/status/";
+    string params = "{\"request\":\"/v1/order/status\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"order_id\":" + to_string(order_id);
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getActiveOrders(string &result)
+{
+    
+    string endPoint = "/orders/";
+    string params = "{\"request\":\"/v1/orders\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+getActivePositions(string &result)
+{
+    
+    string endPoint = "/positions/";
+    string params = "{\"request\":\"/v1/positions\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
+int BitfinexAPI::
+claimPosition(string &result, long &position_id, const double &amount)
+{
+    
+    string endPoint = "/position/claim/";
+    string params = "{\"request\":\"/v1/position/claim\",\"nonce\":\"" + getTonce() + "\"";
+    
+    params += ",\"position_id\":" + to_string(position_id);
+    params += ",\"amount\":\"" + to_string(amount) + "\"";
+    
+    params += "}";
+    return DoPOSTrequest(endPoint, params, result);
+    
+}
+
+
 
 
 //////////////////////////////////////////////////////////////////////////////
