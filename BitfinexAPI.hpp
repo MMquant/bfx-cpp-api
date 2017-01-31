@@ -47,6 +47,8 @@ public:
     };
     typedef vector<sOrder> vOrders;
     
+    typedef vector<long long> vIds;
+    
     // Constructor - destructor
     explicit BitfinexAPI(const string &accessKey, const string &secretKey);
     ~BitfinexAPI();
@@ -55,7 +57,7 @@ public:
     string getWDconfFilePath() const { return WDconfFilePath; }
     void setWDconfFilePath(const string &path) { WDconfFilePath = path; }
     
-    //  Public endpoints
+    /// Public endpoints ///
     int getTicker(string &result, const string &symbol);
     int getStats(string &result, const string &symbol);
     int getFundingBook(string &result, const string &currency, const int &limit_bids = 50,
@@ -89,7 +91,7 @@ public:
                  const double &buy_price_oco = 0);
     int newOrders(string &result, const vOrders &orders);
     int cancelOrder(string &result, const long long &order_id);
-    int cancelOrders(string &result, const vector<long long> &vOrder_ids);
+    int cancelOrders(string &result, const vIds &vOrder_ids);
     int cancelAllOrders(string &result);
     int replaceOrder(string &result, const long long &order_id, const string &symbol,
                      const double &amount, const double &price, const string &side,
@@ -99,12 +101,12 @@ public:
     int getActiveOrders(string &result);
     //  Positions
     int getActivePositions(string &result);
-    int claimPosition(string &result, long &position_id, const double &amount);
+    int claimPosition(string &result, long long &position_id, const double &amount);
     //  Historical data
     int getBalanceHistory(string &result, const string &currency, const time_t &since = 0,
                           const time_t &until = 0, const int &limit = 500,
                           const string &walletType = "all");
-    int getDWHistory(string &result, const string &currency, const string &method,
+    int getDWHistory(string &result, const string &currency, const string &method = "all",
                      const time_t &since = 0 , const time_t &until = 0,
                      const int &limit = 500);
     int getPastTrades(string &result, const string &symbol, const time_t &timestamp,

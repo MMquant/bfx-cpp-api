@@ -458,7 +458,7 @@ cancelOrder(string &result, const long long &order_id)
 
 
 int BitfinexAPI::
-cancelOrders(string &result, const vector<long long> &vOrder_ids)
+cancelOrders(string &result, const vIds &vOrder_ids)
 {
     
     string endPoint = "/order/cancel/multi/";
@@ -576,7 +576,7 @@ getActivePositions(string &result)
 
 
 int BitfinexAPI::
-claimPosition(string &result, long &position_id, const double &amount)
+claimPosition(string &result, long long &position_id, const double &amount)
 {
     
     string endPoint = "/position/claim/";
@@ -637,7 +637,7 @@ getDWHistory(string &result, const string &currency, const string &method,
         return badCurrency;
     }
     // Is deposit method valid ?
-    if(!inArray(method, methods) && method != "wire")
+    if(!inArray(method, methods) && method != "wire" && method != "all")
     {
         return badDepositMethod;
     }
@@ -646,7 +646,10 @@ getDWHistory(string &result, const string &currency, const string &method,
     string params = "{\"request\":\"/v1/history/movements\",\"nonce\":\"" + getTonce() + "\"";
     
     params += ",\"currency\":\"" + currency + "\"";
-    params += ",\"method\":\"" + method + "\"";
+    if (method != "all")
+    {
+        params += ",\"method\":\"" + method + "\"";
+    }
     params += ",\"since\":\"" + to_string(since) + "\"";
     params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
     params += ",\"limit\":" + to_string(limit);
