@@ -46,6 +46,11 @@ using std::vector;
 using std::to_string;
 
 
+// CRYPTOPP_NO_GLOBAL_BYTE signals byte is at CryptoPP::byte
+#if defined(CRYPTOPP_NO_GLOBAL_BYTE)
+    using CryptoPP::byte;
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor - destructor
