@@ -1015,7 +1015,7 @@ DoGETrequest(const string &UrlEndPoint, const string &params, string &result)
         // libcurl internal error handling
         if (res != CURLE_OK)
         {
-            cout << "Libcurl error in DoGETRequest(), code:\n";
+            cout << "Libcurl error in DoGETrequest(), code:\n";
             return res;
         }
         return res;
@@ -1060,7 +1060,7 @@ DoPOSTrequest(const string &UrlEndPoint, const string &params, string &result)
         // libcurl internal error handling
         if (res != CURLE_OK)
         {
-            cout << "Libcurl error in DoGETRequest(), code:\n";
+            cout << "Libcurl error in DoPOSTrequest(), code:\n";
             return res;
         }
         return res;
