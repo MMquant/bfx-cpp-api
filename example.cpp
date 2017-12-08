@@ -40,11 +40,6 @@ int main(int argc, char *argv[])
         getline(ifs, secretKey);
         
         BitfinexAPI bfxAPI(accessKey, secretKey);
-
-		/////////////////////////////////////////////////////////////////////////
-		// This magic is needed to avoid crashes at a public endpoint after the authenticated.
-		/////////////////////////////////////////////////////////////////////////
-
         string response;
         int errCode;
         
