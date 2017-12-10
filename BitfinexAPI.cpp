@@ -1007,9 +1007,12 @@ DoGETrequest(const string &UrlEndPoint, const string &params, string &result)
     if(curl) {
         
         string url = APIurl + UrlEndPoint + params;
+        
+        curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
+        
         res = curl_easy_perform(curl);
         
         // libcurl internal error handling
@@ -1048,6 +1051,7 @@ DoPOSTrequest(const string &UrlEndPoint, const string &params, string &result)
         httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-PAYLOAD:" + payload).c_str());
         httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-SIGNATURE:" + signature).c_str());
         
+        curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L); // debug option
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_POST, 1);
@@ -1055,8 +1059,9 @@ DoPOSTrequest(const string &UrlEndPoint, const string &params, string &result)
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, httpHeaders);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
+        
         res = curl_easy_perform(curl);
-        curl_slist_free_all(httpHeaders);
+        
         // libcurl internal error handling
         if (res != CURLE_OK)
         {
