@@ -1,3 +1,4 @@
 *.pbxproj
-
 *.xcscheme
+DerivedData/*
+key-secret
