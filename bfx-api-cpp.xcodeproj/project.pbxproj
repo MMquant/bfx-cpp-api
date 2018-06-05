@@ -35,6 +35,7 @@
 		F5F39FC120C736C9007F9134 /* withdraw.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = withdraw.conf; sourceTree = "<group>"; };
 		F5F39FC220C736F7007F9134 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = license.txt; sourceTree = "<group>"; };
 		F5F39FC320C737A1007F9134 /* key-secret */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "key-secret"; sourceTree = "<group>"; };
+		F5F39FC420C73A68007F9134 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +57,7 @@
 				F5F39FBE20C736A0007F9134 /* include */,
 				F5F39FBD20C7368E007F9134 /* doc */,
 				30D3E0451E3CEBAD00550117 /* README.md */,
+				F5F39FC420C73A68007F9134 /* .gitignore */,
 				F5F39FC320C737A1007F9134 /* key-secret */,
 				30D3E0471E4084FE00550117 /* example.cpp */,
 				F5F39FC220C736F7007F9134 /* license.txt */,
