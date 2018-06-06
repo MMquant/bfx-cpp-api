@@ -1,6 +1,0 @@
-*.pbxproj
-*.xcscheme
-DerivedData/
-key-secret
-.DS_Store
-bfx-api-cpp.xcodeproj/
