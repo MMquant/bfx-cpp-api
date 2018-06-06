@@ -848,9 +848,10 @@ protected:
             string url = _APIurl + UrlEndPoint + params;
             
             _curl = curl_easy_init();
+            curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 30L);
             curl_easy_setopt(_curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, WriteCallback);
             curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &result);
+            curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, WriteCallback);
             
             _res = curl_easy_perform(_curl);
             
@@ -886,13 +887,14 @@ protected:
             httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-SIGNATURE:" + signature).c_str());
             
             _curl = curl_easy_init();
-            curl_easy_setopt(_curl, CURLOPT_VERBOSE, 0L); // debug option
-            curl_easy_setopt(_curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(_curl, CURLOPT_HTTPHEADER, httpHeaders);
             curl_easy_setopt(_curl, CURLOPT_POST, 1);
             curl_easy_setopt(_curl, CURLOPT_POSTFIELDS, "\n");
-            curl_easy_setopt(_curl, CURLOPT_HTTPHEADER, httpHeaders);
-            curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 30L);
+            curl_easy_setopt(_curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(_curl, CURLOPT_VERBOSE, 0L); // debug option
             curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &result);
+            curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, WriteCallback);
             
             _res = curl_easy_perform(_curl);
             
