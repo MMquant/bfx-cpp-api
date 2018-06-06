@@ -1,0 +1,6 @@
+.DS_Store
+DerivedData/
+bfx-cpp-api.xcodeproj/
+include/.DS_Store
+include/rapidjson/.DS_Store
+key-secret
