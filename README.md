@@ -1,8 +1,36 @@
 # bfx-cpp-api
 
-_Simple static library for interfacing Bitfinex REST API_
-***
-BitfinexAPI depends on cryptopp and libcurl libraries. Install them before use
-and don't forget to link them with your project.
+_C++ Bitfinex REST API client_
 
-See examples for general usage.
+***
+
+### Synopsis
+
+This header-only library contains class for interfacing Bitfinex REST API v1
+
+### Installation
+
+Just copy content of `include/` directory into your project's `include/` directory and
+add `#include "BitfinexAPI.hpp"` to your `.cpp` file.
+
+### Usage
+
+See self-explanatory `example.cpp` for general usage.
+
+### Dependencies
+
+*bfx-cpp-api* depends on following external libraries
+
+* libcryptopp - [https://www.cryptopp.com/](https://www.cryptopp.com/)
+* libcurl - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
+
+### ToDo
+
+- [ ] Integrating RapidJSON
+- [ ] Unit tests
+- [ ] JSON Scheme validation
+- [ ] Compile-time fetch and initialization of internal containers in BitfinexAPI() constructor
+
+### Author
+
+Petr Javorik [www.mmquant.net](www.mmquant.net) [maple@mmquant.net](maple@mmquant.net)
