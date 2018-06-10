@@ -306,6 +306,13 @@ public:
         return DoPOSTrequest("/account_infos/", params, result);
     };
     
+    int getAccountFees(string &result)
+    {
+        string params = "{\"request\":\"/v1/account_fees\",\"nonce\":\"" + getTonce() + "\"";
+        params += "}";
+        return DoPOSTrequest("/account_fees/", params, result);
+    };
+    
     int getSummary(string &result)
     {
         string params = "{\"request\":\"/v1/summary\",\"nonce\":\"" + getTonce() + "\"";
@@ -547,6 +554,15 @@ public:
         return DoPOSTrequest("/orders/", params, result);
     };
     
+    int getOrdersHistory(string &result, const int &limit = 50)
+    {
+        string params = "{\"request\":\"/v1/orders/hist\",\"nonce\":\"" + getTonce() + "\"";
+        params += ",\"limit\":" + to_string(limit);
+        params += "}";
+        return DoPOSTrequest("/orders/hist/", params, result);
+    };
+    
+    
     //  Positions
     int getActivePositions(string &result)
     {
@@ -708,6 +724,38 @@ public:
         return DoPOSTrequest("/offers/", params, result);
     };
     
+    int getOffersHistory(string &result, const int &limit)
+    {
+        string params = "{\"request\":\"/v1/offers/hist\",\"nonce\":\"" + getTonce() + "\"";
+        params += ",\"limit\":" + to_string(limit);
+        params += "}";
+        return DoPOSTrequest("/offers/hist/", params, result);
+    };
+    
+    // There is ambiguity in the "symbol" parameter value for this call.
+    // It should be "currency" not "symbol".
+    // Typical values for "symbol" are trading pairs such as "btcusd", "btcltc" ...
+    // Typical values for "currency" are "btc", "ltc" ...
+    int getPastFundingTrades(string &result,
+                             const string &currency,
+                             const time_t &until = 0,
+                             const int &limit_trades = 50)
+    {
+        // Is currency valid ?
+        if(!inArray(currency, _currencies))
+        {
+            return badCurrency;
+        }
+        
+        string params = "{\"request\":\"/v1/mytrades_funding\",\"nonce\":\"" + getTonce() + "\"";
+        // param inconsistency in BFX API, symbol should be currency
+        params += ",\"symbol\":\"" + currency + "\"";
+        params += ",\"until\":" + to_string(until);
+        params += ",\"limit_trades\":" + to_string(limit_trades);
+        params += "}";
+        return DoPOSTrequest("/mytrades_funding/", params, result);
+    };
+    
     int getTakenFunds(string &result)
     {
         string params = "{\"request\":\"/v1/taken_funds\",\"nonce\":\"" + getTonce() + "\"";
@@ -735,6 +783,14 @@ public:
         params += ",\"swap_id\":" + to_string(offer_id);
         params += "}";
         return DoPOSTrequest("/funding/close/", params, result);
+    };
+    
+    int closePosition(string &result, const long long &position_id)
+    {
+        string params = "{\"request\":\"/v1/position/close\",\"nonce\":\"" + getTonce() + "\"";
+        params += ",\"position_id\":" + to_string(position_id);
+        params += "}";
+        return DoPOSTrequest("/position/close/", params, result);
     };
     
 protected:

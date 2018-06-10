@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     string response;
     int errCode = 0;
     
-      errCode = bfxAPI.getTicker(response, "btcusd");
+    //  errCode = bfxAPI.getTicker(response, "btcusd");
     //  errCode = bfxAPI.getStats(response, "btcusd");
     //  errCode = bfxAPI.getFundingBook(response, "USD", 50, 50);
     //  errCode = bfxAPI.getOrderBook(response, "btcusd", 50, 50, 1);
@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
         bfxAPI.setKeys(accessKey, secretKey);
         
         ///  Account  ///
-            errCode = bfxAPI.getAccountInfo(response);
+        //  errCode = bfxAPI.getAccountInfo(response);
+        //  errCode = bfxAPI.getAccountFees(response);
         //  errCode = bfxAPI.getSummary(response);
         //  errCode = bfxAPI.deposit(response, "bitcoin", "deposit", 1);
         //  errCode = bfxAPI.getKeyPermissions(response);
@@ -106,6 +107,8 @@ int main(int argc, char *argv[])
         //                                "exchange limit", 0, 0);
         //  errCode = bfxAPI.getOrderStatus(response, 12113548453LL);
         //  errCode = bfxAPI.getActiveOrders(response);
+        //  errCode = bfxAPI.getOrdersHistory(response, 10);
+        
         
         ///  Positions  ///
         //  errCode = bfxAPI.getActivePositions(response);
@@ -122,10 +125,13 @@ int main(int argc, char *argv[])
         //  errCode = bfxAPI.getOfferStatus(response, 12313541215LL);
         //  errCode = bfxAPI.getActiveCredits(response);
         //  errCode = bfxAPI.getOffers(response);
+        //  errCode = bfxAPI.getOffersHistory(response, 50);
+        //  errCode = bfxAPI.getPastFundingTrades(response, "BTC", 0, 50);
         //  errCode = bfxAPI.getTakenFunds(response);
         //  errCode = bfxAPI.getUnusedTakenFunds(response);
         //  errCode = bfxAPI.getTotalTakenFunds(response);
         //  errCode = bfxAPI.closeLoan(response, 1235845634LL);
+        //  errCode = bfxAPI.closePosition(response, 1235845634LL);
         
         cout << "Response: " << response << endl;
         cout << "Error code: " << errCode << endl;
