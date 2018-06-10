@@ -25,7 +25,7 @@
 
 #pragma once
 
-
+// std
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -36,12 +36,17 @@
 #include <utility>
 #include <vector>
 
+// curl
 #include <curl/curl.h>
 
+// cryptopp
 #include <cryptopp/base64.h>
 #include <cryptopp/hex.h>
 #include <cryptopp/hmac.h>
 #include <cryptopp/osrng.h>
+
+// internal jsonutils
+#include "jsonutils.hpp"
 
 
 using std::cout;
@@ -107,34 +112,60 @@ public:
     _APIurl("https://api.bitfinex.com/v1"),
     _curl(curl_easy_init())
     {
-        _symbols =
-        {
-            "btcusd", "ltcusd", "ltcbtc",
-            "ethusd", "ethbtc", "etcbtc",
-            "etcusd", "bfxusd", "bfxbtc",
-            "rrtusd", "rrtbtc", "zecusd",
-            "zecbtc", "xmrusd", "xmrbtc"
-        };
+        string temp;
+        getSymbols(temp);
+        jsonutils::arrayToUset(_symbols, temp);
+        
         _currencies =
         {
-            "USD", "BTC", "ETH", "ETC", "BFX", "ZEC", "LTC"
+            "BTG",
+            "DSH",
+            "ETC",
+            "ETP",
+            "EUR",
+            "GBP",
+            "IOT",
+            "JPY",
+            "LTC",
+            "NEO",
+            "OMG",
+            "SAN",
+            "USD",
+            "XMR",
+            "XRP",
+            "ZEC"
         };
+        // As found on https://bitfinex.readme.io/v1/reference#rest-auth-deposit
         _methods =
         {
-            "bitcoin", "litecoin", "ethereum",
-            "mastercoin", "ethereumc", "zcash",
-            "monero"
+            "bcash"
+            "bitcoin",
+            "ethereum",
+            "ethereumc",
+            "ethereumc",
+            "litecoin",
+            "mastercoin",
+            "monero",
+            "tetheruso",
+            "zcash",
         };
-        _walletTypes =
+        _walletNames =
         {
             "trading", "exchange", "deposit"
         };
         // New order endpoint "type" parameter
         _types =
         {
-            "market","limit", "stop", "trailing-stop", "fill-or-kill",
-            "exchange market", "exchange limit", "exchange stop",
-            "exchange trailing-stop", "exchange fill-or-kill"
+            "market",
+            "limit",
+            "stop",
+            "trailing-stop",
+            "fill-or-kill",
+            "exchange market",
+            "exchange limit",
+            "exchange stop",
+            "exchange trailing-stop",
+            "exchange fill-or-kill"
         };
     }
     
@@ -298,7 +329,7 @@ public:
     
     int deposit(string &result,
                 const string &method,
-                const string &walletType,
+                const string &walletName,
                 const bool &renew = 0)
     {
         // Is deposit method valid ?
@@ -307,7 +338,7 @@ public:
             return badDepositMethod;
         }
         // Is walletType valid ?
-        if(!inArray(walletType, _walletTypes))
+        if(!inArray(walletName, _walletNames))
         {
             return badWalletType;
         }
@@ -315,7 +346,7 @@ public:
         string endPoint = "/deposit/new/";
         string params = "{\"request\":\"/v1/deposit/new\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"method\":\"" + method + "\"";
-        params += ",\"wallet_name\":\"" + walletType + "\"";
+        params += ",\"wallet_name\":\"" + walletName + "\"";
         params += ",\"renew\":" + to_string(renew);
         params += "}";
         return DoPOSTrequest(endPoint, params, result);
@@ -357,7 +388,7 @@ public:
             return badCurrency;
         }
         // Is walletType valid ?
-        if(!inArray(walletfrom, _walletTypes) || !inArray(walletto, _walletTypes))
+        if(!inArray(walletfrom, _walletNames) || !inArray(walletto, _walletNames))
         {
             return badWalletType;
         }
@@ -580,7 +611,7 @@ public:
         }
         // Is wallet type valid ?
         // Modified condition which accepts "all" value for all wallets balances together.
-        if(!inArray(walletType, _walletTypes) && walletType != "all")
+        if(!inArray(walletType, _walletNames) && walletType != "all")
         {
             return badWalletType;
         }
@@ -600,7 +631,7 @@ public:
         return DoPOSTrequest(endPoint, params, result);
     };
     
-    int getDWHistory(string &result,
+    int getWithdrawalHistory(string &result,
                      const string &currency,
                      const string &method = "all",
                      const time_t &since = 0,
@@ -761,7 +792,7 @@ protected:
     unordered_set<string> _symbols; // possible symbol pairs
     unordered_set<string> _currencies; // possible currencies
     unordered_set<string> _methods; // possible deposit methods
-    unordered_set<string> _walletTypes; // possible walletTypes
+    unordered_set<string> _walletNames; // possible walletTypes
     unordered_set<string> _types; // possible Types (see new order endpoint)
     string _WDconfFilePath;
     string _APIurl;
@@ -882,9 +913,12 @@ protected:
             
             // Headers
             struct curl_slist *httpHeaders = nullptr;
-            httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-APIKEY:" + _accessKey).c_str());
-            httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-PAYLOAD:" + payload).c_str());
-            httpHeaders = curl_slist_append(httpHeaders, ("X-BFX-SIGNATURE:" + signature).c_str());
+            httpHeaders = curl_slist_append(httpHeaders,
+                                            ("X-BFX-APIKEY:" + _accessKey).c_str());
+            httpHeaders = curl_slist_append(httpHeaders,
+                                            ("X-BFX-PAYLOAD:" + payload).c_str());
+            httpHeaders = curl_slist_append(httpHeaders,
+                                            ("X-BFX-SIGNATURE:" + signature).c_str());
             
             _curl = curl_easy_init();
             curl_easy_setopt(_curl, CURLOPT_HTTPHEADER, httpHeaders);

@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         bfxAPI.setKeys(accessKey, secretKey);
         
         ///  Account  ///
-        //  errCode = bfxAPI.getAccountInfo(response);
+            errCode = bfxAPI.getAccountInfo(response);
         //  errCode = bfxAPI.getSummary(response);
         //  errCode = bfxAPI.deposit(response, "bitcoin", "deposit", 1);
         //  errCode = bfxAPI.getKeyPermissions(response);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
         
         ///  Historical data  ///
         //  errCode = bfxAPI.getBalanceHistory(response, "USD", 0L, 0L, 500, "all");
-        //  errCode = bfxAPI.getDWHistory(response, "BTC", "all", 0L , 0L, 500);
+        //  errCode = bfxAPI.getWithdrawalHistory(response, "BTC", "all", 0L , 0L, 500);
         //  errCode = bfxAPI.getPastTrades(response, "btcusd", 0L, 0L, 500, 0);
         
         ///  Margin funding  ///
@@ -130,8 +130,6 @@ int main(int argc, char *argv[])
         cout << "Response: " << response << endl;
         cout << "Error code: " << errCode << endl;
         
-        
         return 0;
-        
     }
 }
