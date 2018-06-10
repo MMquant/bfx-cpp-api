@@ -200,9 +200,7 @@ public:
             return badSymbol;
         }
         
-        string endPoint = "/pubticker/" + symbol;
-        string params = "";
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/pubticker/" + symbol, "", result);
     };
     
     int getStats(string &result, const string &symbol)
@@ -213,9 +211,7 @@ public:
             return badSymbol;
         }
         
-        string endPoint = "/stats/" + symbol;
-        string params = "";
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/stats/" + symbol, "", result);
     };
     
     int getFundingBook(string &result,
@@ -229,11 +225,10 @@ public:
             return badCurrency;
         }
         
-        string endPoint = "/lendbook/" + currency;
         string params =
         "?limit_bids=" + to_string(limit_bids) +
         "&limit_asks=" + to_string(limit_asks);
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/lendbook/" + currency, params, result);
     };
     
     int getOrderBook(string &result,
@@ -248,12 +243,11 @@ public:
             return badSymbol;
         }
         
-        string endPoint = "/book/" + symbol;
         string params =
         "?limit_bids=" + to_string(limit_bids) +
         "&limit_asks=" + to_string(limit_asks) +
         "&group=" + to_string(group);
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/book/" + symbol, params, result);
     };
     
     int getTrades(string &result,
@@ -267,11 +261,10 @@ public:
             return badSymbol;
         }
         
-        string endPoint = "/trades/" + symbol;
         string params =
         "?timestamp=" + to_string(since) +
         "&limit_trades=" + to_string(limit_trades);
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/trades/" + symbol, params, result);
     };
     
     int getLends(string &result,
@@ -285,25 +278,20 @@ public:
             return badCurrency;
         }
         
-        string endPoint = "/lends/" + currency;
         string params =
         "?timestamp=" + to_string(since) +
         "&limit_lends=" + to_string(limit_lends);
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/lends/" + currency, params, result);
     };
     
     int getSymbols(string &result)
     {
-        string endPoint = "/symbols/";
-        string params = "";
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/symbols/", "", result);
     };
     
     int getSymbolDetails(string &result)
     {
-        string endPoint = "/symbols_details/";
-        string params = "";
-        return DoGETrequest(endPoint, params, result);
+        return DoGETrequest("/symbols_details/", "", result);
     };
     
     //////////////////////////////////////////////////////////////////////////////
@@ -313,18 +301,16 @@ public:
     //  Account
     int getAccountInfo(string &result)
     {
-        string endPoint = "/account_infos/";
         string params = "{\"request\":\"/v1/account_infos\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/account_infos/", params, result);
     };
     
     int getSummary(string &result)
     {
-        string endPoint = "/summary/";
         string params = "{\"request\":\"/v1/summary\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/summary/", params, result);
     };
     
     int deposit(string &result,
@@ -343,37 +329,33 @@ public:
             return badWalletType;
         }
         
-        string endPoint = "/deposit/new/";
         string params = "{\"request\":\"/v1/deposit/new\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"method\":\"" + method + "\"";
         params += ",\"wallet_name\":\"" + walletName + "\"";
         params += ",\"renew\":" + to_string(renew);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/deposit/new/", params, result);
     };
     
     int getKeyPermissions(string &result)
     {
-        string endPoint = "/key_info/";
         string params = "{\"request\":\"/v1/key_info\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/key_info/", params, result);
     };
     
     int getMarginInfos(string &result)
     {
-        string endPoint = "/margin_infos/";
         string params = "{\"request\":\"/v1/margin_infos\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/margin_infos/", params, result);
     };
     
     int getBalances(string &result)
     {
-        string endPoint = "/balances/";
         string params = "{\"request\":\"/v1/balances\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/balances/", params, result);
     };
     
     int transfer(string &result,
@@ -393,19 +375,17 @@ public:
             return badWalletType;
         }
         
-        string endPoint = "/transfer/";
         string params = "{\"request\":\"/v1/transfer\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"amount\":\"" + to_string(amount) + "\"";
         params += ",\"currency\":\"" + currency + "\"";
         params += ",\"walletfrom\":\"" + walletfrom + "\"";
         params += ",\"walletto\":\"" + walletto + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/transfer/", params, result);
     };
     
     int withdraw(string &result) // configure withdraw.conf file before use
     {
-        string endPoint = "/withdraw/";
         string params = "{\"request\":\"/v1/withdraw\",\"nonce\":\"" + getTonce() + "\"";
         
         // Add params from withdraw.conf
@@ -413,7 +393,7 @@ public:
         if (err != 0) { return err; };
         
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/withdraw/", params, result);
     };
     
     //  Orders
@@ -440,7 +420,6 @@ public:
             return badOrderType;
         }
         
-        string endPoint = "/order/new/";
         string params = "{\"request\":\"/v1/order/new\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"symbol\":\"" + symbol + "\"";
         params += ",\"amount\":\"" + to_string(amount) + "\"";
@@ -453,12 +432,11 @@ public:
         params += ",\"ocoorder\":" + bool2string(ocoorder);
         params += ",\"buy_price_oco\":" + bool2string(buy_price_oco);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/order/new/", params, result);
     };
     
     int newOrders(string &result, const vOrders &orders)
     {
-        string endPoint = "/order/new/multi/";
         string params = "{\"request\":\"/v1/order/new/multi\",\"nonce\":\"" + getTonce() + "\"";
         
         // Get pointer to last element in orders. We will not place
@@ -480,21 +458,19 @@ public:
         }
         params += "]";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/order/new/multi/", params, result);
     };
     
     int cancelOrder(string &result, const long long &order_id)
     {
-        string endPoint = "/order/cancel/";
         string params = "{\"request\":\"/v1/order/cancel\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"order_id\":" + to_string(order_id);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/order/cancel/", params, result);
     };
     
     int cancelOrders(string &result, const vIds &vOrder_ids)
     {
-        string endPoint = "/order/cancel/multi/";
         string params = "{\"request\":\"/v1/order/cancel/multi\",\"nonce\":\"" + getTonce() + "\"";
         
         // Get pointer to last element in vOrders. We will not place
@@ -512,15 +488,14 @@ public:
         }
         params += "]";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/order/cancel/multi/", params, result);
     };
     
     int cancelAllOrders(string &result)
     {
-        string endPoint = "/order/cancel/all/";
         string params = "{\"request\":\"/v1/order/cancel/all\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/order/cancel/all/", params, result);
     };
     
     int replaceOrder(string &result,
@@ -544,7 +519,6 @@ public:
             return badOrderType;
         }
         
-        string endPoint = "/order/cancel/replace/";
         string params = "{\"request\":\"/v1/order/cancel/replace\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"order_id\":" + to_string(order_id);
         params += ",\"symbol\":\"" + symbol + "\"";
@@ -555,45 +529,41 @@ public:
         params += ",\"is_hidden\":" + bool2string(is_hidden);
         params += ",\"use_all_available\":" + bool2string(use_remaining);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/order/cancel/replace/", params, result);
     };
     
     int getOrderStatus(string &result, const long long &order_id)
     {
-        string endPoint = "/order/status/";
         string params = "{\"request\":\"/v1/order/status\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"order_id\":" + to_string(order_id);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/order/status/", params, result);
     };
     
     int getActiveOrders(string &result)
     {
-        string endPoint = "/orders/";
         string params = "{\"request\":\"/v1/orders\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/orders/", params, result);
     };
     
     //  Positions
     int getActivePositions(string &result)
     {
-        string endPoint = "/positions/";
         string params = "{\"request\":\"/v1/positions\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/positions/", params, result);
     };
     
     int claimPosition(string &result,
                       long long &position_id,
                       const double &amount)
     {
-        string endPoint = "/position/claim/";
         string params = "{\"request\":\"/v1/position/claim\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"position_id\":" + to_string(position_id);
         params += ",\"amount\":\"" + to_string(amount) + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/position/claim/", params, result);
     };
     
     //  Historical data
@@ -616,7 +586,6 @@ public:
             return badWalletType;
         }
         
-        string endPoint = "/history/";
         string params = "{\"request\":\"/v1/history\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"currency\":\"" + currency + "\"";
         params += ",\"since\":\"" + to_string(since) + "\"";
@@ -628,7 +597,7 @@ public:
         }
         
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/history/", params, result);
     };
     
     int getWithdrawalHistory(string &result,
@@ -649,7 +618,6 @@ public:
             return badDepositMethod;
         }
         
-        string endPoint = "/history/movements/";
         string params = "{\"request\":\"/v1/history/movements\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"currency\":\"" + currency + "\"";
         if (method != "all")
@@ -660,7 +628,7 @@ public:
         params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
         params += ",\"limit\":" + to_string(limit);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/history/movements/", params, result);
     };
     
     int getPastTrades(string &result,
@@ -676,7 +644,6 @@ public:
             return badSymbol;
         }
         
-        string endPoint = "/mytrades/";
         string params = "{\"request\":\"/v1/mytrades\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"symbol\":\"" + symbol + "\"";
         params += ",\"timestamp\":\"" + to_string(timestamp) + "\"";
@@ -684,7 +651,7 @@ public:
         params += ",\"limit_trades\":" + to_string(limit_trades);
         params += ",\"reverse\":" + to_string(reverse);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/mytrades/", params, result);
     };
     
     //  Margin funding
@@ -701,7 +668,6 @@ public:
             return badCurrency;
         }
         
-        string endPoint = "/offer/new/";
         string params = "{\"request\":\"/v1/offer/new\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"currency\":\"" + currency + "\"";
         params += ",\"amount\":\"" + to_string(amount) + "\"";
@@ -709,74 +675,66 @@ public:
         params += ",\"period\":" + to_string(period);
         params += ",\"direction\":\"" + direction + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/offer/new/", params, result);
     };
     
     int cancelOffer(string &result, const long long &offer_id)
     {
-        string endPoint = "/offer/cancel/";
         string params = "{\"request\":\"/v1/offer/cancel\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"offer_id\":" + to_string(offer_id);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/offer/cancel/", params, result);
     };
     
     int getOfferStatus(string &result, const long long &offer_id)
     {
-        string endPoint = "/offer/status/";
         string params = "{\"request\":\"/v1/offer/status\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"offer_id\":" + to_string(offer_id);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/offer/status/", params, result);
     };
     
     int getActiveCredits(string &result)
     {
-        string endPoint = "/credits/";
         string params = "{\"request\":\"/v1/credits\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/credits/", params, result);
     };
     
     int getOffers(string &result)
     {
-        string endPoint = "/offers/";
         string params = "{\"request\":\"/v1/offers\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/offers/", params, result);
     };
     
     int getTakenFunds(string &result)
     {
-        string endPoint = "/taken_funds/";
         string params = "{\"request\":\"/v1/taken_funds\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/taken_funds/", params, result);
     };
     
     int getUnusedTakenFunds(string &result)
     {
-        string endPoint = "/unused_taken_funds/";
         string params = "{\"request\":\"/v1/unused_taken_funds\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/unused_taken_funds/", params, result);
     };
     
     int getTotalTakenFunds(string &result)
     {
-        string endPoint = "/total_taken_funds/";
         string params = "{\"request\":\"/v1/total_taken_funds\",\"nonce\":\"" + getTonce() + "\"";
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/total_taken_funds/", params, result);
     };
     
     int closeLoan(string &result, const long long &offer_id)
     {
-        string endPoint = "/funding/close/";
         string params = "{\"request\":\"/v1/funding/close\",\"nonce\":\"" + getTonce() + "\"";
         params += ",\"swap_id\":" + to_string(offer_id);
         params += "}";
-        return DoPOSTrequest(endPoint, params, result);
+        return DoPOSTrequest("/funding/close/", params, result);
     };
     
 protected:

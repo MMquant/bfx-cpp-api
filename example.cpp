@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     string response;
     int errCode = 0;
     
-    errCode = bfxAPI.getTicker(response, "btcusd");
+      errCode = bfxAPI.getTicker(response, "btcusd");
     //  errCode = bfxAPI.getStats(response, "btcusd");
     //  errCode = bfxAPI.getFundingBook(response, "USD", 50, 50);
     //  errCode = bfxAPI.getOrderBook(response, "btcusd", 50, 50, 1);
