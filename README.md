@@ -29,7 +29,6 @@ See self-explanatory `example.cpp` for general usage.
 - [ ] Integrating RapidJSON
 - [ ] Unit tests
 - [ ] JSON Scheme validation
-- [ ] Compile-time fetch and initialization of internal containers in BitfinexAPI() constructor
 
 ### Author
 
