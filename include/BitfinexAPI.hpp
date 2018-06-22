@@ -95,9 +95,8 @@ namespace BfxAPI
             string side;
             string type;
         };
-        typedef vector<sOrder> vOrders;
-        
-        typedef vector<long long> vIds;
+        using vOrders = vector<sOrder>;
+        using vIds = vector<long long>;
         
         //////////////////////////////////////////////////////////////////////////////
         // Constructor - destructor
@@ -168,6 +167,10 @@ namespace BfxAPI
                 "exchange fill-or-kill"
             };
         }
+        
+        // BitfinexAPI object cannot be copied
+        BitfinexAPI(const BitfinexAPI&) = delete;
+        BitfinexAPI& operator = (const BitfinexAPI&) = delete;
         
         ~BitfinexAPI()
         {
@@ -794,10 +797,6 @@ namespace BfxAPI
         };
         
     protected:
-        
-        // BitfinexAPI object cannot be copied
-        BitfinexAPI(const BitfinexAPI&);
-        BitfinexAPI& operator = (const BitfinexAPI&);
         
         //////////////////////////////////////////////////////////////////////////////
         // Private attributes
