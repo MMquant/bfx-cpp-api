@@ -111,6 +111,7 @@ namespace BfxAPI
         _APIurl("https://api.bitfinex.com/v1"),
         _curl(curl_easy_init())
         {
+            // populate _symbols directly from Bitfinex getSymbols endpoint
             string temp;
             getSymbols(temp);
             jsonutils::arrayToUset(_symbols, temp);
@@ -799,7 +800,7 @@ namespace BfxAPI
     protected:
         
         //////////////////////////////////////////////////////////////////////////////
-        // Private attributes
+        // Protected attributes
         //////////////////////////////////////////////////////////////////////////////
         
         unordered_set<string> _symbols; // possible symbol pairs
@@ -814,7 +815,7 @@ namespace BfxAPI
         CURLcode _res;
         
         //////////////////////////////////////////////////////////////////////////////
-        // Utility private methods
+        // Utility protected methods
         //////////////////////////////////////////////////////////////////////////////
         
         int parseWDconfParams(string &params)
