@@ -181,7 +181,7 @@ namespace BfxAPI
         // Accessors
         //////////////////////////////////////////////////////////////////////////////
         
-        string getWDconfFilePath() const { return _WDconfFilePath; }
+        const string& getWDconfFilePath() const { return _WDconfFilePath; }
         
         void setWDconfFilePath(const string &path) { _WDconfFilePath = path; }
         
