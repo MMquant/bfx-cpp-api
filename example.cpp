@@ -18,6 +18,8 @@ using std::ifstream;
 using std::endl;
 using std::string;
 
+using BfxAPI::BitfinexAPI;
+
 
 int main(int argc, char *argv[])
 {
