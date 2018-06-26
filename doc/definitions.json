@@ -1,0 +1,11 @@
+{
+    "flatJsonSchema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "description": "Flat JSON string array scheme used in jsonutils::jsonStrToUset",
+        "type": "array",
+        "items": {
+            "type": "string"
+        },
+        "uniqueItems": true
+    }
+}

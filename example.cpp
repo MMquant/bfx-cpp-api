@@ -7,15 +7,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
+// std
 #include <fstream>
 #include <iostream>
+
+// BitfinexAPI
 #include "BitfinexAPI.hpp"
 
 
+// namespaces
 using std::cout;
-using std::ifstream;
 using std::endl;
+using std::ifstream;
 using std::string;
 
 using BfxAPI::BitfinexAPI;
@@ -43,7 +46,7 @@ int main(int argc, char *argv[])
     //  errCode = bfxAPI.getOrderBook(response, "btcusd", 50, 50, 1);
     //  errCode = bfxAPI.getTrades(response, "btcusd", 0L, 50);
     //  errCode = bfxAPI.getLends(response, "USD", 0L, 50);
-    //  errCode = bfxAPI.getSymbols(response);
+    // errCode = bfxAPI.getSymbols(response);
     //  errCode = bfxAPI.getSymbolDetails(response);
     
     cout << "Response: " << response << endl;

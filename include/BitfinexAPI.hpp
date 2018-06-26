@@ -1,3 +1,4 @@
+////////////////////////////////////////////////////////////////////////////////
 //  BitfinexAPI.hpp
 //
 //
@@ -19,7 +20,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -47,6 +48,7 @@
 #include "jsonutils.hpp"
 
 
+// namespaces
 using std::cout;
 using std::string;
 using std::to_string;
@@ -66,9 +68,9 @@ namespace BfxAPI
     {
     public:
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Enumerations
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         enum bfxERR // positive values for curl internal error codes
         {
             curlERR = -50,
@@ -79,12 +81,13 @@ namespace BfxAPI
             requiredParamsMissing = -36,
             wireParamsMissing = -35,
             addressParamsMissing = -34,
-            badOrderType = -33
+            badOrderType = -33,
+            jsonStrToUSetError = -10
         };
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Typedefs
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         // Structure for multiple new orders endpoint
         struct sOrder
@@ -98,25 +101,25 @@ namespace BfxAPI
         using vOrders = vector<sOrder>;
         using vIds = vector<long long>;
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Constructor - destructor
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         explicit BitfinexAPI():BitfinexAPI("", "") {}
         
         explicit BitfinexAPI(const string &accessKey, const string &secretKey):
-        _accessKey(accessKey),
-        _secretKey(secretKey),
-        _WDconfFilePath("doc/withdraw.conf"),
-        _APIurl("https://api.bitfinex.com/v1"),
-        _curl(curl_easy_init())
+        accessKey_(accessKey),
+        secretKey_(secretKey),
+        WDconfFilePath_("doc/withdraw.conf"),
+        APIurl_("https://api.bitfinex.com/v1"),
+        curl_(curl_easy_init())
         {
             // populate _symbols directly from Bitfinex getSymbols endpoint
             string temp;
             getSymbols(temp);
-            jsonutils::arrayToUset(_symbols, temp);
+            jsonutils::jsonStrToUset(symbols_, temp);
             
-            _currencies =
+            currencies_ =
             {
                 "BTG",
                 "DSH",
@@ -135,8 +138,9 @@ namespace BfxAPI
                 "XRP",
                 "ZEC"
             };
-            // As found on https://bitfinex.readme.io/v1/reference#rest-auth-deposit
-            _methods =
+            // As found on
+            // https://bitfinex.readme.io/v1/reference#rest-auth-deposit
+            methods_ =
             {
                 "bcash"
                 "bitcoin",
@@ -149,12 +153,12 @@ namespace BfxAPI
                 "tetheruso",
                 "zcash",
             };
-            _walletNames =
+            walletNames_ =
             {
                 "trading", "exchange", "deposit"
             };
             // New order endpoint "type" parameter
-            _types =
+            types_ =
             {
                 "market",
                 "limit",
@@ -175,31 +179,31 @@ namespace BfxAPI
         
         ~BitfinexAPI()
         {
-            curl_easy_cleanup(_curl);
+            curl_easy_cleanup(curl_);
         }
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Accessors
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
-        const string& getWDconfFilePath() const { return _WDconfFilePath; }
+        const string& getWDconfFilePath() const { return WDconfFilePath_; }
         
-        void setWDconfFilePath(const string &path) { _WDconfFilePath = path; }
+        void setWDconfFilePath(const string &path) { WDconfFilePath_ = path; }
         
         void setKeys(const string &accessKey, const string &secretKey)
         {
-            this->_accessKey = accessKey;
-            this->_secretKey = secretKey;
+            this->accessKey_ = accessKey;
+            this->secretKey_ = secretKey;
         }
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Public endpoints
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         int getTicker(string &result, const string &symbol)
         {
             // Is symbol valid ?
-            if(!inArray(symbol, _symbols))
+            if(!inArray(symbol, symbols_))
             {
                 return badSymbol;
             }
@@ -210,7 +214,7 @@ namespace BfxAPI
         int getStats(string &result, const string &symbol)
         {
             // Is symbol valid ?
-            if(!inArray(symbol, _symbols))
+            if(!inArray(symbol, symbols_))
             {
                 return badSymbol;
             }
@@ -224,7 +228,7 @@ namespace BfxAPI
                            const int &limit_asks = 50)
         {
             // Is currency valid ?
-            if(!inArray(currency, _currencies))
+            if(!inArray(currency, currencies_))
             {
                 return badCurrency;
             }
@@ -242,7 +246,7 @@ namespace BfxAPI
                          const bool &group = 1)
         {
             // Is symbol valid ?
-            if(!inArray(symbol, _symbols))
+            if(!inArray(symbol, symbols_))
             {
                 return badSymbol;
             }
@@ -260,7 +264,7 @@ namespace BfxAPI
                       const int &limit_trades = 50)
         {
             // Is symbol valid ?
-            if(!inArray(symbol, _symbols))
+            if(!inArray(symbol, symbols_))
             {
                 return badSymbol;
             }
@@ -277,7 +281,7 @@ namespace BfxAPI
                      const int &limit_lends = 50)
         {
             // Is currency valid ?
-            if(!inArray(currency, _currencies))
+            if(!inArray(currency, currencies_))
             {
                 return badCurrency;
             }
@@ -298,28 +302,31 @@ namespace BfxAPI
             return DoGETrequest("/symbols_details/", "", result);
         };
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Authenticated endpoints
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         //  Account
         int getAccountInfo(string &result)
         {
-            string params = "{\"request\":\"/v1/account_infos\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/account_infos\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/account_infos/", params, result);
         };
         
         int getAccountFees(string &result)
         {
-            string params = "{\"request\":\"/v1/account_fees\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/account_fees\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/account_fees/", params, result);
         };
         
         int getSummary(string &result)
         {
-            string params = "{\"request\":\"/v1/summary\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/summary\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/summary/", params, result);
         };
@@ -330,17 +337,18 @@ namespace BfxAPI
                     const bool &renew = 0)
         {
             // Is deposit method valid ?
-            if(!inArray(method, _methods))
+            if(!inArray(method, methods_))
             {
                 return badDepositMethod;
             }
             // Is walletType valid ?
-            if(!inArray(walletName, _walletNames))
+            if(!inArray(walletName, walletNames_))
             {
                 return badWalletType;
             }
             
-            string params = "{\"request\":\"/v1/deposit/new\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/deposit/new\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"method\":\"" + method + "\"";
             params += ",\"wallet_name\":\"" + walletName + "\"";
             params += ",\"renew\":" + to_string(renew);
@@ -350,21 +358,24 @@ namespace BfxAPI
         
         int getKeyPermissions(string &result)
         {
-            string params = "{\"request\":\"/v1/key_info\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/key_info\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/key_info/", params, result);
         };
         
         int getMarginInfos(string &result)
         {
-            string params = "{\"request\":\"/v1/margin_infos\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/margin_infos\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/margin_infos/", params, result);
         };
         
         int getBalances(string &result)
         {
-            string params = "{\"request\":\"/v1/balances\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/balances\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/balances/", params, result);
         };
@@ -376,17 +387,19 @@ namespace BfxAPI
                      const string &walletto)
         {
             // Is currency valid ?
-            if(!inArray(currency, _currencies))
+            if(!inArray(currency, currencies_))
             {
                 return badCurrency;
             }
             // Is walletType valid ?
-            if(!inArray(walletfrom, _walletNames) || !inArray(walletto, _walletNames))
+            if(!inArray(walletfrom, walletNames_) ||
+               !inArray(walletto, walletNames_))
             {
                 return badWalletType;
             }
             
-            string params = "{\"request\":\"/v1/transfer\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/transfer\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"amount\":\"" + to_string(amount) + "\"";
             params += ",\"currency\":\"" + currency + "\"";
             params += ",\"walletfrom\":\"" + walletfrom + "\"";
@@ -397,7 +410,8 @@ namespace BfxAPI
         
         int withdraw(string &result) // configure withdraw.conf file before use
         {
-            string params = "{\"request\":\"/v1/withdraw\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/withdraw\",\"nonce\":\"" +
+            getTonce() + "\"";
             
             // Add params from withdraw.conf
             int err = parseWDconfParams(params);
@@ -421,17 +435,18 @@ namespace BfxAPI
                      const double &buy_price_oco = 0)
         {
             // Is symbol valid ?
-            if(!inArray(symbol, _symbols))
+            if(!inArray(symbol, symbols_))
             {
                 return badSymbol;
             }
             // Is order type valid ?
-            if(!inArray(type, _types))
+            if(!inArray(type, types_))
             {
                 return badOrderType;
             }
             
-            string params = "{\"request\":\"/v1/order/new\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/order/new\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"symbol\":\"" + symbol + "\"";
             params += ",\"amount\":\"" + to_string(amount) + "\"";
             params += ",\"price\":\"" + to_string(price) + "\"";
@@ -448,7 +463,8 @@ namespace BfxAPI
         
         int newOrders(string &result, const vOrders &orders)
         {
-            string params = "{\"request\":\"/v1/order/new/multi\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/order/new/multi\",\"nonce\":\""
+            + getTonce() + "\"";
             
             // Get pointer to last element in orders. We will not place
             // ',' character at the end of the last loop.
@@ -474,7 +490,8 @@ namespace BfxAPI
         
         int cancelOrder(string &result, const long long &order_id)
         {
-            string params = "{\"request\":\"/v1/order/cancel\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/order/cancel\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"order_id\":" + to_string(order_id);
             params += "}";
             return DoPOSTrequest("/order/cancel/", params, result);
@@ -482,7 +499,8 @@ namespace BfxAPI
         
         int cancelOrders(string &result, const vIds &vOrder_ids)
         {
-            string params = "{\"request\":\"/v1/order/cancel/multi\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/order/cancel/multi\",\"nonce\":\""
+            + getTonce() + "\"";
             
             // Get pointer to last element in vOrders. We will not place
             // ',' character at the end of the last loop.
@@ -504,7 +522,8 @@ namespace BfxAPI
         
         int cancelAllOrders(string &result)
         {
-            string params = "{\"request\":\"/v1/order/cancel/all\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/order/cancel/all\",\"nonce\":\""
+            + getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/order/cancel/all/", params, result);
         };
@@ -520,17 +539,18 @@ namespace BfxAPI
                          const bool &use_remaining = 0)
         {
             // Is symbol valid ?
-            if(!inArray(symbol, _symbols))
+            if(!inArray(symbol, symbols_))
             {
                 return badSymbol;
             }
             // Is order type valid ?
-            if(!inArray(type, _types))
+            if(!inArray(type, types_))
             {
                 return badOrderType;
             }
             
-            string params = "{\"request\":\"/v1/order/cancel/replace\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/order/cancel/replace\",\"nonce\":\""
+            + getTonce() + "\"";
             params += ",\"order_id\":" + to_string(order_id);
             params += ",\"symbol\":\"" + symbol + "\"";
             params += ",\"amount\":\"" + to_string(amount) + "\"";
@@ -545,7 +565,8 @@ namespace BfxAPI
         
         int getOrderStatus(string &result, const long long &order_id)
         {
-            string params = "{\"request\":\"/v1/order/status\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/order/status\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"order_id\":" + to_string(order_id);
             params += "}";
             return DoPOSTrequest("/order/status/", params, result);
@@ -553,14 +574,16 @@ namespace BfxAPI
         
         int getActiveOrders(string &result)
         {
-            string params = "{\"request\":\"/v1/orders\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/orders\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/orders/", params, result);
         };
         
         int getOrdersHistory(string &result, const int &limit = 50)
         {
-            string params = "{\"request\":\"/v1/orders/hist\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/orders/hist\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
             return DoPOSTrequest("/orders/hist/", params, result);
@@ -570,7 +593,8 @@ namespace BfxAPI
         //  Positions
         int getActivePositions(string &result)
         {
-            string params = "{\"request\":\"/v1/positions\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/positions\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/positions/", params, result);
         };
@@ -579,7 +603,8 @@ namespace BfxAPI
                           long long &position_id,
                           const double &amount)
         {
-            string params = "{\"request\":\"/v1/position/claim\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/position/claim\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"position_id\":" + to_string(position_id);
             params += ",\"amount\":\"" + to_string(amount) + "\"";
             params += "}";
@@ -595,21 +620,24 @@ namespace BfxAPI
                               const string &walletType = "all")
         {
             // Is currency valid ?
-            if(!inArray(currency, _currencies))
+            if(!inArray(currency, currencies_))
             {
                 return badCurrency;
             }
             // Is wallet type valid ?
-            // Modified condition which accepts "all" value for all wallets balances together.
-            if(!inArray(walletType, _walletNames) && walletType != "all")
+            // Modified condition which accepts "all" value for all wallets
+            // balances together.
+            if(!inArray(walletType, walletNames_) && walletType != "all")
             {
                 return badWalletType;
             }
             
-            string params = "{\"request\":\"/v1/history\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/history\",\"nonce\":\"" +
+            getTonce() + "\"";
             params += ",\"currency\":\"" + currency + "\"";
             params += ",\"since\":\"" + to_string(since) + "\"";
-            params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
+            params += ",\"until\":\"" + (!until ? getTonce() : to_string(until))
+            + "\"";
             params += ",\"limit\":" + to_string(limit);
             if (walletType != "all")
             {
@@ -628,24 +656,26 @@ namespace BfxAPI
                                  const int &limit = 500)
         {
             // Is currency valid ?
-            if(!inArray(currency, _currencies))
+            if(!inArray(currency, currencies_))
             {
                 return badCurrency;
             }
             // Is deposit method valid ?
-            if(!inArray(method, _methods) && method != "wire" && method != "all")
+            if(!inArray(method, methods_) && method != "wire" && method != "all")
             {
                 return badDepositMethod;
             }
             
-            string params = "{\"request\":\"/v1/history/movements\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/history/movements\",\"nonce\":\""
+            + getTonce() + "\"";
             params += ",\"currency\":\"" + currency + "\"";
             if (method != "all")
             {
                 params += ",\"method\":\"" + method + "\"";
             }
             params += ",\"since\":\"" + to_string(since) + "\"";
-            params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
+            params += ",\"until\":\"" +
+                (!until ? getTonce() : to_string(until)) + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
             return DoPOSTrequest("/history/movements/", params, result);
@@ -659,15 +689,17 @@ namespace BfxAPI
                           const bool reverse = 0)
         {
             // Is symbol valid ?
-            if(!inArray(symbol, _symbols))
+            if(!inArray(symbol, symbols_))
             {
                 return badSymbol;
             }
             
-            string params = "{\"request\":\"/v1/mytrades\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/mytrades\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += ",\"symbol\":\"" + symbol + "\"";
             params += ",\"timestamp\":\"" + to_string(timestamp) + "\"";
-            params += ",\"until\":\"" + (!until ? getTonce() : to_string(until)) + "\"";
+            params += ",\"until\":\"" +
+                (!until ? getTonce() : to_string(until)) + "\"";
             params += ",\"limit_trades\":" + to_string(limit_trades);
             params += ",\"reverse\":" + to_string(reverse);
             params += "}";
@@ -683,12 +715,13 @@ namespace BfxAPI
                      const string &direction)
         {
             // Is currency valid ?
-            if(!inArray(currency, _currencies))
+            if(!inArray(currency, currencies_))
             {
                 return badCurrency;
             }
             
-            string params = "{\"request\":\"/v1/offer/new\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/offer/new\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += ",\"currency\":\"" + currency + "\"";
             params += ",\"amount\":\"" + to_string(amount) + "\"";
             params += ",\"rate\":\"" + to_string(rate) + "\"";
@@ -700,7 +733,8 @@ namespace BfxAPI
         
         int cancelOffer(string &result, const long long &offer_id)
         {
-            string params = "{\"request\":\"/v1/offer/cancel\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/offer/cancel\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += ",\"offer_id\":" + to_string(offer_id);
             params += "}";
             return DoPOSTrequest("/offer/cancel/", params, result);
@@ -708,7 +742,8 @@ namespace BfxAPI
         
         int getOfferStatus(string &result, const long long &offer_id)
         {
-            string params = "{\"request\":\"/v1/offer/status\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/offer/status\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += ",\"offer_id\":" + to_string(offer_id);
             params += "}";
             return DoPOSTrequest("/offer/status/", params, result);
@@ -716,21 +751,24 @@ namespace BfxAPI
         
         int getActiveCredits(string &result)
         {
-            string params = "{\"request\":\"/v1/credits\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/credits\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/credits/", params, result);
         };
         
         int getOffers(string &result)
         {
-            string params = "{\"request\":\"/v1/offers\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/offers\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/offers/", params, result);
         };
         
         int getOffersHistory(string &result, const int &limit)
         {
-            string params = "{\"request\":\"/v1/offers/hist\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/offers/hist\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
             return DoPOSTrequest("/offers/hist/", params, result);
@@ -738,7 +776,8 @@ namespace BfxAPI
         
         // There is ambiguity in the "symbol" parameter value for this call.
         // It should be "currency" not "symbol".
-        // Typical values for "symbol" are trading pairs such as "btcusd", "btcltc" ...
+        // Typical values for "symbol" are trading pairs such as "btcusd",
+        // "btcltc" ...
         // Typical values for "currency" are "btc", "ltc" ...
         int getPastFundingTrades(string &result,
                                  const string &currency,
@@ -746,12 +785,13 @@ namespace BfxAPI
                                  const int &limit_trades = 50)
         {
             // Is currency valid ?
-            if(!inArray(currency, _currencies))
+            if(!inArray(currency, currencies_))
             {
                 return badCurrency;
             }
             
-            string params = "{\"request\":\"/v1/mytrades_funding\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/mytrades_funding\",\"nonce\":\""
+                            + getTonce() + "\"";
             // param inconsistency in BFX API, symbol should be currency
             params += ",\"symbol\":\"" + currency + "\"";
             params += ",\"until\":" + to_string(until);
@@ -762,28 +802,32 @@ namespace BfxAPI
         
         int getTakenFunds(string &result)
         {
-            string params = "{\"request\":\"/v1/taken_funds\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/taken_funds\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/taken_funds/", params, result);
         };
         
         int getUnusedTakenFunds(string &result)
         {
-            string params = "{\"request\":\"/v1/unused_taken_funds\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/unused_taken_funds\",\"nonce\":\""
+                            + getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/unused_taken_funds/", params, result);
         };
         
         int getTotalTakenFunds(string &result)
         {
-            string params = "{\"request\":\"/v1/total_taken_funds\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/total_taken_funds\",\"nonce\":\""
+                            + getTonce() + "\"";
             params += "}";
             return DoPOSTrequest("/total_taken_funds/", params, result);
         };
         
         int closeLoan(string &result, const long long &offer_id)
         {
-            string params = "{\"request\":\"/v1/funding/close\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/funding/close\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += ",\"swap_id\":" + to_string(offer_id);
             params += "}";
             return DoPOSTrequest("/funding/close/", params, result);
@@ -791,7 +835,8 @@ namespace BfxAPI
         
         int closePosition(string &result, const long long &position_id)
         {
-            string params = "{\"request\":\"/v1/position/close\",\"nonce\":\"" + getTonce() + "\"";
+            string params = "{\"request\":\"/v1/position/close\",\"nonce\":\"" +
+                            getTonce() + "\"";
             params += ",\"position_id\":" + to_string(position_id);
             params += "}";
             return DoPOSTrequest("/position/close/", params, result);
@@ -799,24 +844,24 @@ namespace BfxAPI
         
     protected:
         
-        //////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
         // Protected attributes
-        //////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
         
-        unordered_set<string> _symbols; // possible symbol pairs
-        unordered_set<string> _currencies; // possible currencies
-        unordered_set<string> _methods; // possible deposit methods
-        unordered_set<string> _walletNames; // possible walletTypes
-        unordered_set<string> _types; // possible Types (see new order endpoint)
-        string _WDconfFilePath;
-        string _APIurl;
-        string _accessKey, _secretKey;
-        CURL *_curl;
-        CURLcode _res;
+        unordered_set<string> symbols_; // valid symbol pairs
+        unordered_set<string> currencies_; // valid currencies
+        unordered_set<string> methods_; // valid deposit methods
+        unordered_set<string> walletNames_; // valid walletTypes
+        unordered_set<string> types_; // valid Types (see new order endpoint)
+        string WDconfFilePath_;
+        string APIurl_;
+        string accessKey_, secretKey_;
+        CURL *curl_;
+        CURLcode res_;
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Utility protected methods
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         int parseWDconfParams(string &params)
         {
@@ -830,7 +875,7 @@ namespace BfxAPI
             string line;
             ifstream inFile;
             map<string, string> mParams;
-            inFile.open(_WDconfFilePath);
+            inFile.open(WDconfFilePath_);
             regex rgx("^(.*)\\b\\s*=\\s*(\"{0,1}.*\"{0,1})$");
             smatch match;
             
@@ -865,7 +910,7 @@ namespace BfxAPI
                     return wireParamsMissing;
                 }
             }
-            else if (inArray(mParams["withdraw_type"], _methods))
+            else if (inArray(mParams["withdraw_type"], methods_))
             {
                 if(!mParams.count("address"))
                 {
@@ -886,27 +931,29 @@ namespace BfxAPI
             return 0;
         };
         
-        int DoGETrequest(const string &UrlEndPoint, const string &params, string &result)
+        int DoGETrequest(const string &UrlEndPoint,
+                         const string &params,
+                         string &result)
         {
-            if(_curl)
+            if(curl_)
             {
-                string url = _APIurl + UrlEndPoint + params;
+                string url = APIurl_ + UrlEndPoint + params;
                 
-                _curl = curl_easy_init();
-                curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 30L);
-                curl_easy_setopt(_curl, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &result);
-                curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+                curl_ = curl_easy_init();
+                curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
+                curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+                curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &result);
+                curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, WriteCallback);
                 
-                _res = curl_easy_perform(_curl);
+                res_ = curl_easy_perform(curl_);
                 
                 // libcurl internal error handling
-                if (_res != CURLE_OK)
+                if (res_ != CURLE_OK)
                 {
                     cout << "Libcurl error in DoGETrequest(), code:\n";
-                    return _res;
+                    return res_;
                 }
-                return _res;
+                return res_;
             }
             else
             {
@@ -915,44 +962,49 @@ namespace BfxAPI
             }
         };
         
-        int DoPOSTrequest(const string &UrlEndPoint, const string &params, string &result)
+        int DoPOSTrequest(const string &UrlEndPoint,
+                          const string &params,
+                          string &result)
         {
-            if(_curl)
+            if(curl_)
             {
-                string url = _APIurl + UrlEndPoint;
+                string url = APIurl_ + UrlEndPoint;
                 string payload;
                 string signature;
                 getBase64(params, payload);
-                getHmacSha384(_secretKey, payload, signature);
+                getHmacSha384(secretKey_, payload, signature);
                 
                 // Headers
                 struct curl_slist *httpHeaders = nullptr;
-                httpHeaders = curl_slist_append(httpHeaders,
-                                                ("X-BFX-APIKEY:" + _accessKey).c_str());
-                httpHeaders = curl_slist_append(httpHeaders,
-                                                ("X-BFX-PAYLOAD:" + payload).c_str());
-                httpHeaders = curl_slist_append(httpHeaders,
-                                                ("X-BFX-SIGNATURE:" + signature).c_str());
+                httpHeaders =
+                curl_slist_append(httpHeaders,
+                                  ("X-BFX-APIKEY:" + accessKey_).c_str());
+                httpHeaders =
+                curl_slist_append(httpHeaders,
+                                  ("X-BFX-PAYLOAD:" + payload).c_str());
+                httpHeaders =
+                curl_slist_append(httpHeaders,
+                                  ("X-BFX-SIGNATURE:" + signature).c_str());
                 
-                _curl = curl_easy_init();
-                curl_easy_setopt(_curl, CURLOPT_HTTPHEADER, httpHeaders);
-                curl_easy_setopt(_curl, CURLOPT_POST, 1);
-                curl_easy_setopt(_curl, CURLOPT_POSTFIELDS, "\n");
-                curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 30L);
-                curl_easy_setopt(_curl, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(_curl, CURLOPT_VERBOSE, 0L); // debug option
-                curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &result);
-                curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+                curl_ = curl_easy_init();
+                curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, httpHeaders);
+                curl_easy_setopt(curl_, CURLOPT_POST, 1);
+                curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, "\n");
+                curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
+                curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+                curl_easy_setopt(curl_, CURLOPT_VERBOSE, 0L); // debug option
+                curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &result);
+                curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, WriteCallback);
                 
-                _res = curl_easy_perform(_curl);
+                res_ = curl_easy_perform(curl_);
                 
                 // libcurl internal error handling
-                if (_res != CURLE_OK)
+                if (res_ != CURLE_OK)
                 {
                     cout << "Libcurl error in DoPOSTrequest(), code:\n";
-                    return _res;
+                    return res_;
                 }
-                return _res;
+                return res_;
                 
             }
             else
@@ -962,17 +1014,21 @@ namespace BfxAPI
             }
         };
         
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Utility private static methods
-        //////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
-        static string bool2string(const bool &in) { return in ? "true" : "false"; };
+        static string bool2string(const bool &in)
+        {
+            return in ? "true" : "false";
+        };
         
         static string getTonce()
         {
             using namespace std::chrono;
             
-            milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+            milliseconds ms =
+            duration_cast<milliseconds>(system_clock::now().time_since_epoch());
             
             return to_string(ms.count());
         };
@@ -998,7 +1054,9 @@ namespace BfxAPI
             return 0;
         };
         
-        static int getHmacSha384(const string &key, const string &content, string &digest)
+        static int getHmacSha384(const string &key,
+                                 const string &content,
+                                 string &digest)
         {
             using CryptoPP::HashFilter;
             using CryptoPP::HexEncoder;
@@ -1014,23 +1072,29 @@ namespace BfxAPI
             digest.clear();
             
             HMAC<SHA384> hmac(byteKey, byteKey.size());
-            StringSource ss1(content, true, new HashFilter(hmac, new StringSink(mac)));
+            StringSource ss1(content, true,
+                             new HashFilter(hmac, new StringSink(mac)));
             StringSource ss2(mac, true, new HexEncoder(new StringSink(digest)));
             transform(digest.cbegin(), digest.cend(), digest.begin(), ::tolower);
             
             return 0;
         };
         
-        // Curl write callback function. Appends fetched *content to *userp pointer.
-        // *userp pointer is set up by curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result) line.
-        // In this case *userp will point to result.
-        static size_t WriteCallback(void *response, size_t size, size_t nmemb, void *userp)
+        // Curl write callback function. Appends fetched *content to *userp
+        // pointer. *userp pointer is set up by
+        // curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result) line.
+        // In this case *userp points to result.
+        static size_t WriteCallback(void *response,
+                                    size_t size,
+                                    size_t nmemb,
+                                    void *userp)
         {
             (static_cast<string*>(userp))->append(static_cast<char*>(response));
             return size * nmemb;
         };
         
-        static bool inArray(const string &value, const unordered_set<string> &inputSet)
+        static bool inArray(const string &value,
+                            const unordered_set<string> &inputSet)
         {
             return (inputSet.find(value) != inputSet.cend()) ? true : false;
         };
