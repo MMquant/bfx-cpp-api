@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
     string response;
     int errCode = 0;
     
-      errCode = bfxAPI.getTicker(response, "btcusd");
+    //  errCode = bfxAPI.getTicker(response, "btcusd");
     //  errCode = bfxAPI.getStats(response, "btcusd");
     //  errCode = bfxAPI.getFundingBook(response, "USD", 50, 50);
     //  errCode = bfxAPI.getOrderBook(response, "btcusd", 50, 50, 1);
     //  errCode = bfxAPI.getTrades(response, "btcusd", 0L, 50);
     //  errCode = bfxAPI.getLends(response, "USD", 0L, 50);
-    // errCode = bfxAPI.getSymbols(response);
+      errCode = bfxAPI.getSymbols(response);
     //  errCode = bfxAPI.getSymbolDetails(response);
     
     cout << "Response: " << response << endl;

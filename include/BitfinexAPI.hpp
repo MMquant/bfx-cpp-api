@@ -50,6 +50,7 @@
 
 // namespaces
 using std::cout;
+using std::endl;
 using std::string;
 using std::to_string;
 using std::unordered_set;
@@ -71,18 +72,20 @@ namespace BfxAPI
         ////////////////////////////////////////////////////////////////////////
         // Enumerations
         ////////////////////////////////////////////////////////////////////////
-        enum bfxERR // positive values for curl internal error codes
+        
+        enum bfxERR
         {
-            curlERR = -50,
-            badSymbol = -40,
-            badCurrency = -39,
-            badDepositMethod = -38,
-            badWalletType = -37,
-            requiredParamsMissing = -36,
-            wireParamsMissing = -35,
-            addressParamsMissing = -34,
-            badOrderType = -33,
-            jsonStrToUSetError = -10
+            noError = 0,
+            curlERR,
+            badSymbol,
+            badCurrency,
+            badDepositMethod,
+            badWalletType,
+            requiredParamsMissing,
+            wireParamsMissing,
+            addressParamsMissing,
+            badOrderType,
+            jsonStrToUSetError
         };
         
         ////////////////////////////////////////////////////////////////////////
@@ -112,12 +115,15 @@ namespace BfxAPI
         secretKey_(secretKey),
         WDconfFilePath_("doc/withdraw.conf"),
         APIurl_("https://api.bitfinex.com/v1"),
-        curl_(curl_easy_init())
+        curlGET_(curl_easy_init()),
+        curlPOST_(curl_easy_init()),
+        curlStatusCode_(CURLE_OK),
+        bfxApiStatusCode_(noError)
         {
             // populate _symbols directly from Bitfinex getSymbols endpoint
-            string temp;
-            getSymbols(temp);
-            jsonutils::jsonStrToUset(symbols_, temp);
+            getSymbols();
+            jsonutils::jsonStrToUset(symbols_, result_);
+            result_.clear();
             
             currencies_ =
             {
@@ -179,17 +185,29 @@ namespace BfxAPI
         
         ~BitfinexAPI()
         {
-            curl_easy_cleanup(curl_);
+            curl_easy_cleanup(curlGET_);
+            curl_easy_cleanup(curlPOST_);
         }
         
         ////////////////////////////////////////////////////////////////////////
         // Accessors
         ////////////////////////////////////////////////////////////////////////
         
-        const string& getWDconfFilePath() const { return WDconfFilePath_; }
+        // Getters
+        string getWDconfFilePath() const { return WDconfFilePath_; }
+        int getBfxApiStatusCode() const { return bfxApiStatusCode_; }
+        int getCurlStatusCode() const { return curlStatusCode_; }
+        const string& strResponse() const { return result_ ; }
+        bool hasApiError() const
+        {
+            if (bfxApiStatusCode_ == noError && curlStatusCode_ == CURLE_OK)
+                return false;
+            else
+                return true;
+        }
         
+        // Setters
         void setWDconfFilePath(const string &path) { WDconfFilePath_ = path; }
-        
         void setKeys(const string &accessKey, const string &secretKey)
         {
             this->accessKey_ = accessKey;
@@ -200,106 +218,108 @@ namespace BfxAPI
         // Public endpoints
         ////////////////////////////////////////////////////////////////////////
         
-        int getTicker(string &result, const string &symbol)
+        BitfinexAPI& getTicker(const string &symbol)
         {
-            // Is symbol valid ?
-            if(!inArray(symbol, symbols_))
+            if (!inArray(symbol, symbols_))
+                bfxApiStatusCode_ = badSymbol;
+            else
+                DoGETrequest("/pubticker/" + symbol, "");
+            
+            return *this;
+        };
+        
+        BitfinexAPI& getStats(const string &symbol)
+        {
+            if (!inArray(symbol, symbols_))
+                bfxApiStatusCode_ = badSymbol;
+            else
+                DoGETrequest("/stats/" + symbol, "");
+            
+            return *this;
+        };
+        
+        BitfinexAPI& getFundingBook(const string &currency,
+                                    const int &limit_bids = 50,
+                                    const int &limit_asks = 50)
+        {
+            if (!inArray(currency, currencies_))
+                bfxApiStatusCode_ = badCurrency;
+            else
             {
-                return badSymbol;
+                string params =
+                "?limit_bids=" + to_string(limit_bids) +
+                "&limit_asks=" + to_string(limit_asks);
+                DoGETrequest("/lendbook/" + currency, params);
             }
             
-            return DoGETrequest("/pubticker/" + symbol, "", result);
+            return *this;
         };
         
-        int getStats(string &result, const string &symbol)
+        BitfinexAPI& getOrderBook(const string &symbol,
+                                  const int &limit_bids = 50,
+                                  const int &limit_asks = 50,
+                                  const bool &group = 1)
         {
-            // Is symbol valid ?
-            if(!inArray(symbol, symbols_))
+            if (!inArray(symbol, symbols_))
+                bfxApiStatusCode_ = badSymbol;
+            else
             {
-                return badSymbol;
+                string params =
+                "?limit_bids=" + to_string(limit_bids) +
+                "&limit_asks=" + to_string(limit_asks) +
+                "&group=" + to_string(group);
+                DoGETrequest("/book/" + symbol, params);
             }
             
-            return DoGETrequest("/stats/" + symbol, "", result);
+            return *this;
         };
         
-        int getFundingBook(string &result,
-                           const string &currency,
-                           const int &limit_bids = 50,
-                           const int &limit_asks = 50)
+        BitfinexAPI& getTrades(const string &symbol,
+                               const time_t &since = 0,
+                               const int &limit_trades = 50)
         {
-            // Is currency valid ?
-            if(!inArray(currency, currencies_))
+            if (!inArray(symbol, symbols_))
+                bfxApiStatusCode_ = badSymbol;
+            else
             {
-                return badCurrency;
+                string params =
+                "?timestamp=" + to_string(since) +
+                "&limit_trades=" + to_string(limit_trades);
+                DoGETrequest("/trades/" + symbol, params);
             }
             
-            string params =
-            "?limit_bids=" + to_string(limit_bids) +
-            "&limit_asks=" + to_string(limit_asks);
-            return DoGETrequest("/lendbook/" + currency, params, result);
+            return *this;
         };
         
-        int getOrderBook(string &result,
-                         const string &symbol,
-                         const int &limit_bids = 50,
-                         const int &limit_asks = 50,
-                         const bool &group = 1)
+        BitfinexAPI& getLends(const string &currency,
+                              const time_t &since = 0,
+                              const int &limit_lends = 50)
         {
-            // Is symbol valid ?
-            if(!inArray(symbol, symbols_))
+            if (!inArray(currency, currencies_))
+                bfxApiStatusCode_ = badCurrency;
+            else
             {
-                return badSymbol;
+                string params =
+                "?timestamp=" + to_string(since) +
+                "&limit_lends=" + to_string(limit_lends);
+                DoGETrequest("/lends/" + currency, params);
             }
             
-            string params =
-            "?limit_bids=" + to_string(limit_bids) +
-            "&limit_asks=" + to_string(limit_asks) +
-            "&group=" + to_string(group);
-            return DoGETrequest("/book/" + symbol, params, result);
+            return *this;
         };
         
-        int getTrades(string &result,
-                      const string &symbol,
-                      const time_t &since = 0,
-                      const int &limit_trades = 50)
+        BitfinexAPI& getSymbols()
         {
-            // Is symbol valid ?
-            if(!inArray(symbol, symbols_))
-            {
-                return badSymbol;
-            }
+            DoGETrequest("/symbols/", "");
             
-            string params =
-            "?timestamp=" + to_string(since) +
-            "&limit_trades=" + to_string(limit_trades);
-            return DoGETrequest("/trades/" + symbol, params, result);
+            return *this;
         };
         
-        int getLends(string &result,
-                     const string &currency,
-                     const time_t &since = 0,
-                     const int &limit_lends = 50)
+        BitfinexAPI& getSymbolDetails()
         {
-            // Is currency valid ?
-            if(!inArray(currency, currencies_))
-            {
-                return badCurrency;
-            }
+            DoGETrequest("/symbols_details/", "");
             
-            string params =
-            "?timestamp=" + to_string(since) +
-            "&limit_lends=" + to_string(limit_lends);
-            return DoGETrequest("/lends/" + currency, params, result);
-        };
-        
-        int getSymbols(string &result)
-        {
-            return DoGETrequest("/symbols/", "", result);
-        };
-        
-        int getSymbolDetails(string &result)
-        {
-            return DoGETrequest("/symbols_details/", "", result);
+            return *this;
         };
         
         ////////////////////////////////////////////////////////////////////////
@@ -856,8 +876,11 @@ namespace BfxAPI
         string WDconfFilePath_;
         string APIurl_;
         string accessKey_, secretKey_;
-        CURL *curl_;
-        CURLcode res_;
+        CURL *curlGET_;
+        CURL *curlPOST_;
+        CURLcode curlStatusCode_;
+        bfxERR bfxApiStatusCode_;
+        string result_;
         
         ////////////////////////////////////////////////////////////////////////
         // Utility protected methods
@@ -931,34 +954,30 @@ namespace BfxAPI
             return 0;
         };
         
-        int DoGETrequest(const string &UrlEndPoint,
-                         const string &params,
-                         string &result)
+        void DoGETrequest(const string &UrlEndPoint, const string &params)
         {
-            if(curl_)
+            if(curlGET_)
             {
                 string url = APIurl_ + UrlEndPoint + params;
                 
-                curl_ = curl_easy_init();
-                curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
-                curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &result);
-                curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, WriteCallback);
+                result_.clear();
+                curl_easy_setopt(curlGET_, CURLOPT_TIMEOUT, 30L);
+                curl_easy_setopt(curlGET_, CURLOPT_URL, url.c_str());
+                curl_easy_setopt(curlGET_, CURLOPT_WRITEDATA, &result_);
+                curl_easy_setopt(curlGET_, CURLOPT_WRITEFUNCTION, WriteCallback);
                 
-                res_ = curl_easy_perform(curl_);
+                curlStatusCode_ = curl_easy_perform(curlGET_);
                 
                 // libcurl internal error handling
-                if (res_ != CURLE_OK)
+                if (curlStatusCode_ != CURLE_OK)
                 {
-                    cout << "Libcurl error in DoGETrequest(), code:\n";
-                    return res_;
+                    cout << "Libcurl error in DoGETrequest():\n";
+                    cout << "CURLcode: " << curlStatusCode_ << "\n";
                 }
-                return res_;
             }
             else
             {
-                // curl not properly initialized curl = nullptr
-                return curlERR;
+                cout << "curl not properly initialized curl = nullptr";
             }
         };
         
@@ -966,7 +985,7 @@ namespace BfxAPI
                           const string &params,
                           string &result)
         {
-            if(curl_)
+            if(curlPOST_)
             {
                 string url = APIurl_ + UrlEndPoint;
                 string payload;
@@ -986,25 +1005,24 @@ namespace BfxAPI
                 curl_slist_append(httpHeaders,
                                   ("X-BFX-SIGNATURE:" + signature).c_str());
                 
-                curl_ = curl_easy_init();
-                curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, httpHeaders);
-                curl_easy_setopt(curl_, CURLOPT_POST, 1);
-                curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, "\n");
-                curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
-                curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(curl_, CURLOPT_VERBOSE, 0L); // debug option
-                curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &result);
-                curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, WriteCallback);
+                curl_easy_setopt(curlPOST_, CURLOPT_HTTPHEADER, httpHeaders);
+                curl_easy_setopt(curlPOST_, CURLOPT_POST, 1);
+                curl_easy_setopt(curlPOST_, CURLOPT_POSTFIELDS, "\n");
+                curl_easy_setopt(curlPOST_, CURLOPT_TIMEOUT, 30L);
+                curl_easy_setopt(curlPOST_, CURLOPT_URL, url.c_str());
+                curl_easy_setopt(curlPOST_, CURLOPT_VERBOSE, 0L); // debug option
+                curl_easy_setopt(curlPOST_, CURLOPT_WRITEDATA, &result);
+                curl_easy_setopt(curlPOST_, CURLOPT_WRITEFUNCTION, WriteCallback);
                 
-                res_ = curl_easy_perform(curl_);
+                curlStatusCode_ = curl_easy_perform(curlPOST_);
                 
                 // libcurl internal error handling
-                if (res_ != CURLE_OK)
+                if (curlStatusCode_ != CURLE_OK)
                 {
                     cout << "Libcurl error in DoPOSTrequest(), code:\n";
-                    return res_;
+                    return curlStatusCode_;
                 }
-                return res_;
+                return curlStatusCode_;
                 
             }
             else
