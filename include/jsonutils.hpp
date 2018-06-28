@@ -19,7 +19,6 @@
 #include <string>
 #include <unordered_set>
 
-
 // namespaces
 using std::cerr;
 using std::cout;
@@ -115,7 +114,7 @@ namespace jsonutils
         } state_;
     };
     
-    int jsonStrToUset(unordered_set<string> &uSet, string &jsonStr)
+    unsigned jsonStrToUset(unordered_set<string> &uSet, string &jsonStr)
     {
         // Create schema $ref resolver
         rj::Document sd;
@@ -155,7 +154,7 @@ namespace jsonutils
                 validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
                 cout << "Invalid document: " << sb.GetString() << endl;
             }
-            return -10;
+            return 10;
         }
         else
         {

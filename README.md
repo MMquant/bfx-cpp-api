@@ -6,7 +6,7 @@ _C++ Bitfinex REST API client_
 
 ### Synopsis
 
-This header-only library contains class for interfacing Bitfinex REST API v1
+This header-only library contains class for interfacing Bitfinex REST API v1.
 
 ### Installation
 
@@ -15,7 +15,27 @@ add `#include "BitfinexAPI.hpp"` to your `.cpp` file.
 
 ### Usage
 
-See self-explanatory `example.cpp` for general usage.
+	// Create API client for both authenticated and unauthenticated requests
+	BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
+	
+	// Create API client for just unauthenticated requests
+	BfxAPI::BitfinexAPI bfxAPI();
+	
+	// Fetch data
+	bfxAPI.getTicker("btcusd");
+	
+   	// Check for errors
+  	if (!bfxAPI.hasApiError())
+   		// Get response in string
+   		cout << bfxAPI.strResponse() << endl;
+    else
+    {
+        // Inspect errors
+        cout << bfxAPI.getBfxApiStatusCode() << endl;
+        cout << bfxAPI.getCurlStatusCode() << endl;
+    }
+
+See self-explanatory `example.cpp` for general usage and more requests.
 
 ### Dependencies
 
