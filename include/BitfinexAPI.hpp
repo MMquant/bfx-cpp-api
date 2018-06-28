@@ -85,7 +85,8 @@ namespace BfxAPI
             wireParamsMissing,      // 7
             addressParamsMissing,   // 8
             badOrderType,           // 9
-            jsonStrToUSetError      // 10
+            jsonStrToUSetError,     // 10
+            badWDconfFilePath       // 11
         };
         
         ////////////////////////////////////////////////////////////////////////
@@ -194,11 +195,19 @@ namespace BfxAPI
         ////////////////////////////////////////////////////////////////////////
         
         // Getters
-        const string getWDconfFilePath() const { return WDconfFilePath_; }
-        const bfxERR& getBfxApiStatusCode() const { return bfxApiStatusCode_; }
-        const CURLcode& getCurlStatusCode() const { return curlStatusCode_; }
-        const string& strResponse() const { return result_ ; }
-        bool  hasApiError() const
+        const string getWDconfFilePath() const noexcept
+            { return WDconfFilePath_; }
+        
+        const bfxERR& getBfxApiStatusCode() const noexcept
+            { return bfxApiStatusCode_; }
+        
+        const CURLcode& getCurlStatusCode() const noexcept
+            { return curlStatusCode_; }
+        
+        const string& strResponse() const noexcept
+            { return result_ ; }
+        
+        bool  hasApiError() const noexcept
         {
             if (bfxApiStatusCode_ == noError && curlStatusCode_ == CURLE_OK)
                 return false;
@@ -207,8 +216,9 @@ namespace BfxAPI
         }
         
         // Setters
-        void setWDconfFilePath(const string &path) { WDconfFilePath_ = path; }
-        void setKeys(const string &accessKey, const string &secretKey)
+        void setWDconfFilePath(const string &path) noexcept
+            { WDconfFilePath_ = path; }
+        void setKeys(const string &accessKey, const string &secretKey) noexcept
         {
             accessKey_ = accessKey;
             secretKey_ = secretKey;
@@ -923,9 +933,12 @@ namespace BfxAPI
             using std::smatch;
             
             string line;
-            ifstream inFile;
             map<string, string> mParams;
-            inFile.open(WDconfFilePath_);
+            ifstream inFile(WDconfFilePath_, ifstream::in);
+            if (!inFile.is_open())
+            {
+                return badWDconfFilePath;
+            }
             regex rgx("^(.*)\\b\\s*=\\s*(\"{0,1}.*\"{0,1})$");
             smatch match;
             
@@ -1060,10 +1073,10 @@ namespace BfxAPI
         // Utility private static methods
         ////////////////////////////////////////////////////////////////////////
         
-        static string bool2string(const bool &in)
+        static string bool2string(const bool &in) noexcept
         { return in ? "true" : "false"; };
         
-        static string getTonce()
+        static string getTonce() noexcept
         {
             using namespace std::chrono;
             
@@ -1127,14 +1140,14 @@ namespace BfxAPI
         static size_t WriteCallback(void *response,
                                     size_t size,
                                     size_t nmemb,
-                                    void *userp)
+                                    void *userp) noexcept
         {
             (static_cast<string*>(userp))->append(static_cast<char*>(response));
             return size * nmemb;
         };
         
         static bool inArray(const string &value,
-                            const unordered_set<string> &inputSet)
+                            const unordered_set<string> &inputSet) noexcept
         { return (inputSet.find(value) != inputSet.cend()) ? true : false; };
     };
 }
