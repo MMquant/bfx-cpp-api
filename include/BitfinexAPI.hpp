@@ -207,7 +207,7 @@ namespace BfxAPI
         const string& strResponse() const noexcept
             { return result_ ; }
         
-        bool  hasApiError() const noexcept
+        bool hasApiError() const noexcept
         {
             if (bfxApiStatusCode_ == noError && curlStatusCode_ == CURLE_OK)
                 return false;
@@ -216,15 +216,17 @@ namespace BfxAPI
         }
         
         // Setters
-        void setWDconfFilePath(const string &path) noexcept
+        constexpr void setWDconfFilePath(const string &path) noexcept
             { WDconfFilePath_ = path; }
-        void setKeys(const string &accessKey, const string &secretKey) noexcept
+        
+        constexpr void setKeys(const string &accessKey, const string &secretKey) noexcept
         {
             accessKey_ = accessKey;
             secretKey_ = secretKey;
         }
-        string& setAccessKey() { return accessKey_;}
-        string& setSecretKey() { return secretKey_;}
+        
+        constexpr string& setAccessKey() { return accessKey_;}
+        constexpr string& setSecretKey() { return secretKey_;}
         
         ////////////////////////////////////////////////////////////////////////
         // Public endpoints
@@ -1073,7 +1075,7 @@ namespace BfxAPI
         // Utility private static methods
         ////////////////////////////////////////////////////////////////////////
         
-        static string bool2string(const bool &in) noexcept
+        const static string bool2string(const bool &in) noexcept
         { return in ? "true" : "false"; };
         
         static string getTonce() noexcept

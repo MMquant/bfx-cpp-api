@@ -74,7 +74,7 @@ namespace jsonutils
         jsonStrToUsetHandler():state_(State::kExpectArrayStart) {}
         
         // SAX events handlers
-        bool StartArray()
+        bool StartArray() noexcept
         {
             switch (state_)
             {
@@ -98,7 +98,7 @@ namespace jsonutils
             }
         }
         
-        bool EndArray(rj::SizeType)
+        bool EndArray(rj::SizeType) noexcept
         {
             return state_ == State::kExpectValueOrArrayEnd;
         }
