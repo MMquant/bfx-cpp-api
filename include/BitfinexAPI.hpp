@@ -106,7 +106,7 @@ namespace BfxAPI
         using vIds = vector<long long>;
         
         ////////////////////////////////////////////////////////////////////////
-        // Constructor - destructor
+        // Constructor - Destructor
         ////////////////////////////////////////////////////////////////////////
         
         explicit BitfinexAPI():BitfinexAPI("", "") {}
@@ -180,9 +180,13 @@ namespace BfxAPI
             };
         }
         
-        // BitfinexAPI object cannot be copied
+        // BitfinexAPI object cannot be
+        // copied
         BitfinexAPI(const BitfinexAPI&) = delete;
         BitfinexAPI& operator = (const BitfinexAPI&) = delete;
+        // moved
+        BitfinexAPI(BitfinexAPI&&) = delete;
+        BitfinexAPI& operator = (BitfinexAPI&&) = delete;
         
         ~BitfinexAPI()
         {
@@ -901,11 +905,11 @@ namespace BfxAPI
             return *this;
         };
         
-    protected:
+    private:
         
-        /////////////////////////////////////////////////////////////////////////
-        // Protected attributes
-        /////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // Private attributes
+        ////////////////////////////////////////////////////////////////////////
         
         unordered_set<string> symbols_; // valid symbol pairs
         unordered_set<string> currencies_; // valid currencies
@@ -922,7 +926,7 @@ namespace BfxAPI
         string result_;
         
         ////////////////////////////////////////////////////////////////////////
-        // Utility protected methods
+        // Utility private methods
         ////////////////////////////////////////////////////////////////////////
         
         bfxERR parseWDconfParams(string &params)
