@@ -49,6 +49,7 @@
 
 
 // namespaces
+using std::cerr;
 using std::cout;
 using std::endl;
 using std::string;
@@ -65,6 +66,16 @@ using CryptoPP::byte;
 
 namespace BfxAPI
 {
+    ////////////////////////////////////////////////////////////////////////
+    // Global variables
+    ////////////////////////////////////////////////////////////////////////
+    
+    const auto API_URL = "https://api.bitfinex.com/v1";
+    const auto CURL_TIMEOUT = 30L;
+    const auto CURL_DEBUG_VERBOSE = 0L;
+    const auto WITHDRAWAL_CONF_FILE_PATH = "doc/withdraw.conf";
+    
+    
     class BitfinexAPI
     {
     public:
@@ -114,8 +125,8 @@ namespace BfxAPI
         explicit BitfinexAPI(const string &accessKey, const string &secretKey):
         accessKey_(accessKey),
         secretKey_(secretKey),
-        WDconfFilePath_("doc/withdraw.conf"),
-        APIurl_("https://api.bitfinex.com/v1"),
+        WDconfFilePath_(WITHDRAWAL_CONF_FILE_PATH),
+        APIurl_(API_URL),
         curlGET_(curl_easy_init()),
         curlPOST_(curl_easy_init()),
         curlStatusCode_(CURLE_OK),
@@ -229,8 +240,8 @@ namespace BfxAPI
             secretKey_ = secretKey;
         }
         
-        constexpr string& setAccessKey() { return accessKey_;}
-        constexpr string& setSecretKey() { return secretKey_;}
+        constexpr string& getAccessKey() { return accessKey_;}
+        constexpr string& getSecretKey() { return secretKey_;}
         
         ////////////////////////////////////////////////////////////////////////
         // Public endpoints
@@ -241,7 +252,7 @@ namespace BfxAPI
             if (!inArray(symbol, symbols_))
                 bfxApiStatusCode_ = badSymbol;
             else
-                DoGETrequest("/pubticker/" + symbol, "");
+                doGETrequest("/pubticker/" + symbol, "");
             
             return *this;
         };
@@ -251,7 +262,7 @@ namespace BfxAPI
             if (!inArray(symbol, symbols_))
                 bfxApiStatusCode_ = badSymbol;
             else
-                DoGETrequest("/stats/" + symbol, "");
+                doGETrequest("/stats/" + symbol, "");
             
             return *this;
         };
@@ -267,7 +278,7 @@ namespace BfxAPI
                 string params =
                 "?limit_bids=" + to_string(limit_bids) +
                 "&limit_asks=" + to_string(limit_asks);
-                DoGETrequest("/lendbook/" + currency, params);
+                doGETrequest("/lendbook/" + currency, params);
             }
             
             return *this;
@@ -286,7 +297,7 @@ namespace BfxAPI
                 "?limit_bids=" + to_string(limit_bids) +
                 "&limit_asks=" + to_string(limit_asks) +
                 "&group=" + to_string(group);
-                DoGETrequest("/book/" + symbol, params);
+                doGETrequest("/book/" + symbol, params);
             }
             
             return *this;
@@ -303,7 +314,7 @@ namespace BfxAPI
                 string params =
                 "?timestamp=" + to_string(since) +
                 "&limit_trades=" + to_string(limit_trades);
-                DoGETrequest("/trades/" + symbol, params);
+                doGETrequest("/trades/" + symbol, params);
             }
             
             return *this;
@@ -320,7 +331,7 @@ namespace BfxAPI
                 string params =
                 "?timestamp=" + to_string(since) +
                 "&limit_lends=" + to_string(limit_lends);
-                DoGETrequest("/lends/" + currency, params);
+                doGETrequest("/lends/" + currency, params);
             }
             
             return *this;
@@ -328,14 +339,14 @@ namespace BfxAPI
         
         BitfinexAPI& getSymbols()
         {
-            DoGETrequest("/symbols/", "");
+            doGETrequest("/symbols/", "");
             
             return *this;
         };
         
         BitfinexAPI& getSymbolsDetails()
         {
-            DoGETrequest("/symbols_details/", "");
+            doGETrequest("/symbols_details/", "");
             
             return *this;
         };
@@ -350,7 +361,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/account_infos\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/account_infos/", params);
+            doPOSTrequest("/account_infos/", params);
             
             return *this;
         };
@@ -360,7 +371,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/account_fees\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/account_fees/", params);
+            doPOSTrequest("/account_fees/", params);
             
             return *this;
         };
@@ -370,7 +381,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/summary\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/summary/", params);
+            doPOSTrequest("/summary/", params);
             
             return *this;
         };
@@ -391,7 +402,7 @@ namespace BfxAPI
             params += ",\"wallet_name\":\"" + walletName + "\"";
             params += ",\"renew\":" + to_string(renew);
             params += "}";
-            DoPOSTrequest("/deposit/new/", params);
+            doPOSTrequest("/deposit/new/", params);
             
             return *this;
         };
@@ -401,7 +412,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/key_info\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/key_info/", params);
+            doPOSTrequest("/key_info/", params);
             
             return *this;
         };
@@ -411,7 +422,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/margin_infos\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/margin_infos/", params);
+            doPOSTrequest("/margin_infos/", params);
             
             return *this;
         };
@@ -421,7 +432,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/balances\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/balances/", params);
+            doPOSTrequest("/balances/", params);
             
             return *this;
         };
@@ -445,7 +456,7 @@ namespace BfxAPI
             params += ",\"walletfrom\":\"" + walletfrom + "\"";
             params += ",\"walletto\":\"" + walletto + "\"";
             params += "}";
-            DoPOSTrequest("/transfer/", params);
+            doPOSTrequest("/transfer/", params);
             
             return *this;
         };
@@ -463,7 +474,7 @@ namespace BfxAPI
             else
             {
                 params += "}";
-                DoPOSTrequest("/withdraw/", params);
+                doPOSTrequest("/withdraw/", params);
             }
             
             return *this;
@@ -501,7 +512,7 @@ namespace BfxAPI
             params += ",\"buy_price_oco\":" + bool2string(buy_price_oco);
             params += "}";
             
-            DoPOSTrequest("/order/new/", params);
+            doPOSTrequest("/order/new/", params);
             return *this;
         };
         
@@ -526,7 +537,7 @@ namespace BfxAPI
                     params += ",";
             }
             params += "]}";
-            DoPOSTrequest("/order/new/multi/", params);
+            doPOSTrequest("/order/new/multi/", params);
             
             return *this;
         };
@@ -537,7 +548,7 @@ namespace BfxAPI
             getTonce() + "\"";
             params += ",\"order_id\":" + to_string(order_id);
             params += "}";
-            DoPOSTrequest("/order/cancel/", params);
+            doPOSTrequest("/order/cancel/", params);
             
             return *this;
         };
@@ -559,7 +570,7 @@ namespace BfxAPI
                     params += ",";
             }
             params += "]}";
-            DoPOSTrequest("/order/cancel/multi/", params);
+            doPOSTrequest("/order/cancel/multi/", params);
             
             return *this;
         };
@@ -569,7 +580,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/order/cancel/all\",\"nonce\":\""
             + getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/order/cancel/all/", params);
+            doPOSTrequest("/order/cancel/all/", params);
             
             return *this;
         };
@@ -600,7 +611,7 @@ namespace BfxAPI
             params += ",\"is_hidden\":" + bool2string(is_hidden);
             params += ",\"use_all_available\":" + bool2string(use_remaining);
             params += "}";
-            DoPOSTrequest("/order/cancel/replace/", params);
+            doPOSTrequest("/order/cancel/replace/", params);
             
             return *this;
         };
@@ -611,7 +622,7 @@ namespace BfxAPI
             getTonce() + "\"";
             params += ",\"order_id\":" + to_string(order_id);
             params += "}";
-            DoPOSTrequest("/order/status/", params);
+            doPOSTrequest("/order/status/", params);
             
             return *this;
         };
@@ -621,7 +632,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/orders\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/orders/", params);
+            doPOSTrequest("/orders/", params);
             
             return *this;
         };
@@ -632,7 +643,7 @@ namespace BfxAPI
             getTonce() + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
-            DoPOSTrequest("/orders/hist/", params);
+            doPOSTrequest("/orders/hist/", params);
             
             return *this;
         };
@@ -644,7 +655,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/positions\",\"nonce\":\"" +
             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/positions/", params);
+            doPOSTrequest("/positions/", params);
             
             return *this;
         };
@@ -657,7 +668,7 @@ namespace BfxAPI
             params += ",\"position_id\":" + to_string(position_id);
             params += ",\"amount\":\"" + to_string(amount) + "\"";
             params += "}";
-            DoPOSTrequest("/position/claim/", params);
+            doPOSTrequest("/position/claim/", params);
             
             return *this;
         };
@@ -691,7 +702,7 @@ namespace BfxAPI
             if (walletType != "all")
                 params += ",\"wallet\":\"" + walletType + "\"";
             params += "}";
-            DoPOSTrequest("/history/", params);
+            doPOSTrequest("/history/", params);
             
             return *this;
         };
@@ -718,7 +729,7 @@ namespace BfxAPI
                 (!until ? getTonce() : to_string(until)) + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
-            DoPOSTrequest("/history/movements/", params);
+            doPOSTrequest("/history/movements/", params);
             
             return *this;
         };
@@ -742,7 +753,7 @@ namespace BfxAPI
             params += ",\"limit_trades\":" + to_string(limit_trades);
             params += ",\"reverse\":" + to_string(reverse);
             params += "}";
-            DoPOSTrequest("/mytrades/", params);
+            doPOSTrequest("/mytrades/", params);
             }
             
             return *this;
@@ -767,7 +778,7 @@ namespace BfxAPI
             params += ",\"period\":" + to_string(period);
             params += ",\"direction\":\"" + direction + "\"";
             params += "}";
-            DoPOSTrequest("/offer/new/", params);
+            doPOSTrequest("/offer/new/", params);
             }
             
             return  *this;
@@ -779,7 +790,7 @@ namespace BfxAPI
                             getTonce() + "\"";
             params += ",\"offer_id\":" + to_string(offer_id);
             params += "}";
-            DoPOSTrequest("/offer/cancel/", params);
+            doPOSTrequest("/offer/cancel/", params);
             
             return *this;
         };
@@ -790,7 +801,7 @@ namespace BfxAPI
                             getTonce() + "\"";
             params += ",\"offer_id\":" + to_string(offer_id);
             params += "}";
-            DoPOSTrequest("/offer/status/", params);
+            doPOSTrequest("/offer/status/", params);
             
             return *this;
         };
@@ -800,7 +811,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/credits\",\"nonce\":\"" +
                             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/credits/", params);
+            doPOSTrequest("/credits/", params);
             
             return *this;
         };
@@ -810,7 +821,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/offers\",\"nonce\":\"" +
                             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/offers/", params);
+            doPOSTrequest("/offers/", params);
             
             return *this;
         };
@@ -821,7 +832,7 @@ namespace BfxAPI
                             getTonce() + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
-            DoPOSTrequest("/offers/hist/", params);
+            doPOSTrequest("/offers/hist/", params);
             
             return *this;
         };
@@ -847,7 +858,7 @@ namespace BfxAPI
                 params += ",\"until\":" + to_string(until);
                 params += ",\"limit_trades\":" + to_string(limit_trades);
                 params += "}";
-                DoPOSTrequest("/mytrades_funding/", params);
+                doPOSTrequest("/mytrades_funding/", params);
             }
             
             return *this;
@@ -858,7 +869,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/taken_funds\",\"nonce\":\"" +
                             getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/taken_funds/", params);
+            doPOSTrequest("/taken_funds/", params);
             
             return *this;
         };
@@ -868,7 +879,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/unused_taken_funds\",\"nonce\":\""
                             + getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/unused_taken_funds/", params);
+            doPOSTrequest("/unused_taken_funds/", params);
             
             return *this;
         };
@@ -878,7 +889,7 @@ namespace BfxAPI
             string params = "{\"request\":\"/v1/total_taken_funds\",\"nonce\":\""
                             + getTonce() + "\"";
             params += "}";
-            DoPOSTrequest("/total_taken_funds/", params);
+            doPOSTrequest("/total_taken_funds/", params);
             
             return *this;
         };
@@ -889,7 +900,7 @@ namespace BfxAPI
                             getTonce() + "\"";
             params += ",\"swap_id\":" + to_string(offer_id);
             params += "}";
-            DoPOSTrequest("/funding/close/", params);
+            doPOSTrequest("/funding/close/", params);
             
             return *this;
         };
@@ -900,7 +911,7 @@ namespace BfxAPI
                             getTonce() + "\"";
             params += ",\"position_id\":" + to_string(position_id);
             params += "}";
-            DoPOSTrequest("/position/close/", params);
+            doPOSTrequest("/position/close/", params);
             
             return *this;
         };
@@ -1000,7 +1011,7 @@ namespace BfxAPI
             return noError;
         };
         
-        void DoGETrequest(const string &UrlEndPoint, const string &params)
+        void doGETrequest(const string &UrlEndPoint, const string &params)
         {
             bfxApiStatusCode_ = noError;
             
@@ -1009,8 +1020,9 @@ namespace BfxAPI
                 string url = APIurl_ + UrlEndPoint + params;
                 
                 result_.clear();
-                curl_easy_setopt(curlGET_, CURLOPT_TIMEOUT, 30L);
+                curl_easy_setopt(curlGET_, CURLOPT_TIMEOUT, CURL_TIMEOUT);
                 curl_easy_setopt(curlGET_, CURLOPT_URL, url.c_str());
+                curl_easy_setopt(curlGET_, CURLOPT_VERBOSE, CURL_DEBUG_VERBOSE);
                 curl_easy_setopt(curlGET_, CURLOPT_WRITEDATA, &result_);
                 curl_easy_setopt(curlGET_, CURLOPT_WRITEFUNCTION, WriteCallback);
                 
@@ -1019,15 +1031,15 @@ namespace BfxAPI
                 // libcurl internal error handling
                 if (curlStatusCode_ != CURLE_OK)
                 {
-                    cout << "Libcurl error in DoGETrequest():\n";
-                    cout << "CURLcode: " << curlStatusCode_ << "\n";
+                    cerr << "libcurl error in doGETrequest():\n";
+                    cerr << "CURLcode: " << curlStatusCode_ << "\n";
                 }
             }
             else
-                cout << "curl not properly initialized curlGET_ = nullptr";
+                cerr << "curl not properly initialized curlGET_ = nullptr";
         };
         
-        void DoPOSTrequest(const string &UrlEndPoint, const string &params)
+        void doPOSTrequest(const string &UrlEndPoint, const string &params)
         {
             bfxApiStatusCode_ = noError;
             
@@ -1055,9 +1067,9 @@ namespace BfxAPI
                 curl_easy_setopt(curlPOST_, CURLOPT_HTTPHEADER, httpHeaders);
                 curl_easy_setopt(curlPOST_, CURLOPT_POST, 1);
                 curl_easy_setopt(curlPOST_, CURLOPT_POSTFIELDS, "\n");
-                curl_easy_setopt(curlPOST_, CURLOPT_TIMEOUT, 30L);
+                curl_easy_setopt(curlPOST_, CURLOPT_TIMEOUT, CURL_TIMEOUT);
                 curl_easy_setopt(curlPOST_, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(curlPOST_, CURLOPT_VERBOSE, 0L); // debug option
+                curl_easy_setopt(curlPOST_, CURLOPT_VERBOSE, CURL_DEBUG_VERBOSE);
                 curl_easy_setopt(curlPOST_, CURLOPT_WRITEDATA, &result_);
                 curl_easy_setopt(curlPOST_, CURLOPT_WRITEFUNCTION, WriteCallback);
                 
@@ -1066,13 +1078,13 @@ namespace BfxAPI
                 // libcurl internal error handling
                 if (curlStatusCode_ != CURLE_OK)
                 {
-                    cout << "Libcurl error in DoPOSTrequest():\n";
-                    cout << "CURLcode: " << curlStatusCode_ << "\n";
+                    cerr << "Libcurl error in doPOSTrequest():\n";
+                    cerr << "CURLcode: " << curlStatusCode_ << "\n";
                 }
                 
             }
             else
-                cout << "curl not properly initialized curlPOST_ = nullptr";
+                cerr << "curl not properly initialized curlPOST_ = nullptr";
         };
         
         ////////////////////////////////////////////////////////////////////////
@@ -1101,9 +1113,7 @@ namespace BfxAPI
             byte buffer[1024] = {};
             
             for (int i = 0; i < content.length(); ++i)
-            {
                 buffer[i] = content[i];
-            };
             
             StringSource ss(buffer,
                             content.length(),

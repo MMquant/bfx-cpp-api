@@ -16,6 +16,7 @@
 
 
 // namespaces
+using std::cerr;
 using std::cout;
 using std::endl;
 using std::ifstream;
@@ -33,18 +34,18 @@ int main(int argc, char *argv[])
     ifstream ifs("key-secret", ifstream::in);
     if (!ifs.is_open())
     {
-        cout << "Can't open 'key-secret' file. " << endl;
+        cerr << "Can't open 'key-secret' file. " << endl;
         return 1;
     }
-    getline(ifs, bfxAPI.setAccessKey());
-    getline(ifs, bfxAPI.setSecretKey());
+    getline(ifs, bfxAPI.getAccessKey());
+    getline(ifs, bfxAPI.getSecretKey());
     ifs.close();
     
     // Fetch API
     cout << "Request with error checking: " << endl;
     bfxAPI.getTicker("btcusd");
     if (!bfxAPI.hasApiError())
-        cout << bfxAPI.strResponse() << endl;
+        cerr << bfxAPI.strResponse() << endl;
     else
     {
         // see bfxERR enum in BitfinexAPI.hpp::BitfinexAPI

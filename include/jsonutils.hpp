@@ -49,6 +49,7 @@ namespace jsonutils
             fclose(pFileIn);
             remoteSchemaDoc = new rj::SchemaDocument(d);
         };
+        
         ~MyRemoteSchemaDocumentProvider()
         {
             delete remoteSchemaDoc;
