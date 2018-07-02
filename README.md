@@ -11,7 +11,7 @@ This header-only library contains class for interfacing Bitfinex REST API v1.
 ### Installation
 
 Just copy content of `include/` directory into your project's `include/` directory and
-add `#include "BitfinexAPI.hpp"` to your `.cpp` file.
+add `#include "bfx-api-cpp/BitfinexAPI.hpp"` in your `.cpp` file.
 
 ### Usage
 
@@ -35,7 +35,7 @@ add `#include "BitfinexAPI.hpp"` to your `.cpp` file.
         cout << bfxAPI.getCurlStatusCode() << endl;
     }
 
-See self-explanatory `example.cpp` for general usage and more requests.
+See self-explanatory `src/example.cpp` for general usage and more requests.
 
 ### Dependencies
 

@@ -12,7 +12,7 @@
 #include <iostream>
 
 // BitfinexAPI
-#include "BitfinexAPI.hpp"
+#include "bfx-api-cpp/BitfinexAPI.hpp"
 
 
 // namespaces
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     // BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
     
     // Load API keys from file
-    ifstream ifs("key-secret", ifstream::in);
+    ifstream ifs("doc/key-secret", ifstream::in);
     if (!ifs.is_open())
     {
         cerr << "Can't open 'key-secret' file. " << endl;
