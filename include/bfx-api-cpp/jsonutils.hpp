@@ -118,7 +118,7 @@ namespace jsonutils
         } state_;
     };
     
-    bfxERR jsonStrToUset(unordered_set<string> &uSet, string &jsonStr)
+    bfxERR jsonStrToUset(unordered_set<string> &uSet, const string &jsonStr)
     {
         // Create schema $ref resolver
         rj::Document sd;
@@ -143,7 +143,7 @@ namespace jsonutils
         
         // Create input JSON StringStream
         rj::StringStream ss(jsonStr.c_str());
-//        rj::StringStream ss(mockJson.c_str());
+//        rj::StringStream ss(mockJson.c_str()); // DEBUG
         
         // Parse and validate
         if (!reader.Parse(ss, validator))

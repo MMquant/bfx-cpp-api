@@ -115,8 +115,7 @@ namespace BfxAPI
         bfxApiStatusCode_(noError)
         {
             // populate _symbols directly from Bitfinex getSymbols endpoint
-            getSymbols();
-            jsonutils::jsonStrToUset(symbols_, result_);
+            jsonutils::jsonStrToUset(symbols_, getSymbols().strResponse());
             result_.clear();
             
             currencies_ =
@@ -904,17 +903,21 @@ namespace BfxAPI
         // Private attributes
         ////////////////////////////////////////////////////////////////////////
         
+        // containers with supported parameters
         unordered_set<string> symbols_; // valid symbol pairs
         unordered_set<string> currencies_; // valid currencies
         unordered_set<string> methods_; // valid deposit methods
         unordered_set<string> walletNames_; // valid walletTypes
         unordered_set<string> types_; // valid Types (see new order endpoint)
-        string WDconfFilePath_;
-        string APIurl_;
-        string accessKey_, secretKey_;
+        // CURL instances
         CURL *curlGET_;
         CURL *curlPOST_;
         CURLcode curlStatusCode_;
+        // BitfinexAPI settings
+        string WDconfFilePath_;
+        string APIurl_;
+        string accessKey_, secretKey_;
+        // dynamic and status variables
         bfxERR bfxApiStatusCode_;
         string result_;
         
@@ -1086,7 +1089,7 @@ namespace BfxAPI
             return to_string(ms.count());
         };
         
-        static int getBase64(const string &content, string &encoded)
+        static void getBase64(const string &content, string &encoded)
         {
             using CryptoPP::Base64Encoder;
             using CryptoPP::StringSink;
@@ -1101,13 +1104,11 @@ namespace BfxAPI
                             content.length(),
                             true,
                             new Base64Encoder(new StringSink(encoded), false));
-            
-            return 0;
         };
         
-        static int getHmacSha384(const string &key,
-                                 const string &content,
-                                 string &digest)
+        static void getHmacSha384(const string &key,
+                                  const string &content,
+                                  string &digest)
         {
             using CryptoPP::HashFilter;
             using CryptoPP::HexEncoder;
@@ -1127,8 +1128,6 @@ namespace BfxAPI
                              new HashFilter(hmac, new StringSink(mac)));
             StringSource ss2(mac, true, new HexEncoder(new StringSink(digest)));
             transform(digest.cbegin(), digest.cend(), digest.begin(), ::tolower);
-            
-            return 0;
         };
         
         // Curl write callback function. Appends fetched *content to *userp
