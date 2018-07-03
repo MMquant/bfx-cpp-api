@@ -6,6 +6,6 @@
         "items": {
             "type": "string"
         },
-        "uniqueItems": true
+        "uniqueItems": false
     }
 }

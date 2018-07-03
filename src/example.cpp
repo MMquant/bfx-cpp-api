@@ -49,9 +49,11 @@ int main(int argc, char *argv[])
     else
     {
         // see bfxERR enum in BitfinexAPI.hpp::BitfinexAPI
-        cout << bfxAPI.getBfxApiStatusCode() << endl;
+        cerr << "BfxApiStatusCode: ";
+        cerr << bfxAPI.getBfxApiStatusCode() << endl;
         // see https://curl.haxx.se/libcurl/c/libcurl-errors.html
-        cout << bfxAPI.getCurlStatusCode() << endl;
+        cerr << "CurlStatusCode: ";
+        cerr << bfxAPI.getCurlStatusCode() << endl;
     }
     
     cout << "Request without error checking: " << endl;

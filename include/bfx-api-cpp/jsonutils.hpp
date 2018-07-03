@@ -14,6 +14,9 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
+// internal error
+#include "error.hpp"
+
 // std
 #include <iostream>
 #include <string>
@@ -115,7 +118,7 @@ namespace jsonutils
         } state_;
     };
     
-    unsigned jsonStrToUset(unordered_set<string> &uSet, string &jsonStr)
+    bfxERR jsonStrToUset(unordered_set<string> &uSet, string &jsonStr)
     {
         // Create schema $ref resolver
         rj::Document sd;
@@ -134,8 +137,13 @@ namespace jsonutils
         // Create reader
         rj::Reader reader;
         
+        /// DEBUG
+//        string mockJson = "{\"mid\":\"6581.55\",\"bid\":\"6581.5\",\"ask\":\"6581.6\",\"last_price\":\"6581.5\",\"low\":\"6333.2\",\"high\":\"6681.2\",\"volume\":\"28766.900098530004\",\"timestamp\":\"1530620498.4127066\"}";
+        /// DEBUG
+        
         // Create input JSON StringStream
         rj::StringStream ss(jsonStr.c_str());
+//        rj::StringStream ss(mockJson.c_str());
         
         // Parse and validate
         if (!reader.Parse(ss, validator))
@@ -149,18 +157,18 @@ namespace jsonutils
             {
                 rj::StringBuffer sb;
                 validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);
-                cout << "Invalid schema: " << sb.GetString() << endl;
-                cout << "Invalid keyword: " << validator.GetInvalidSchemaKeyword() << endl;
+                cerr << "Invalid schema: " << sb.GetString() << endl;
+                cerr << "Invalid keyword: " << validator.GetInvalidSchemaKeyword() << endl;
                 sb.Clear();
                 validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
-                cout << "Invalid document: " << sb.GetString() << endl;
+                cerr << "Invalid document: " << sb.GetString() << endl;
             }
-            return 10;
+            return bfxERR::jsonStrToUSetError;
         }
         else
         {
             uSet.swap(handler.handlerUSet_);
-            return 0;
+            return bfxERR::noError;
         }
     }
 }
