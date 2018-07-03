@@ -1,11 +1,50 @@
 {
-    "flatJsonSchema": {
-        "$schema": "http://json-schema.org/draft-04/schema#",
-        "description": "Flat JSON string array scheme used in jsonutils::jsonStrToUset",
-        "type": "array",
-        "items": {
-            "type": "string"
-        },
-        "uniqueItems": false
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "flatJsonSchema": {
+    "description": "Flat JSON string array scheme used in jsonutils::jsonStrToUset",
+    "type": "array",
+    "items": {
+      "type": "string"
     }
+  },
+  "pubticker": {
+    "description": "JSON schema used in https://api.bitfinex.com/v1/pubticker/ endpoint",
+    "type": "object",
+    "properties": {
+      "mid": {
+        "type": "string"
+      },
+      "bid": {
+        "type": "string"
+      },
+      "ask": {
+        "type": "string"
+      },
+      "last_price": {
+        "type": "string"
+      },
+      "low": {
+        "type": "string"
+      },
+      "high": {
+        "type": "string"
+      },
+      "volume": {
+        "type": "string"
+      },
+      "timestamp": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "mid",
+      "bid",
+      "ask",
+      "last_price",
+      "low",
+      "high",
+      "volume",
+      "timestamp"
+    ]
+  }
 }
