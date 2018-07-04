@@ -4,6 +4,10 @@ _C++ Bitfinex REST API client_
 
 ***
 
+### Notice
+
+***Master*** branch contains new refactored version of the client. For old version checkout ***legacy*** branch.
+
 ### Synopsis
 
 This header-only library contains class for interfacing Bitfinex REST API v1.
