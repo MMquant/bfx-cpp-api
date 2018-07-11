@@ -6,16 +6,19 @@ _C++ Bitfinex REST API client_
 
 ### Notice
 
-***Master*** branch contains new refactored version of the client. For old version checkout ***legacy*** branch.
+***Master*** branch contains new version of the client. For old version checkout ***legacy*** branch.
 
 ### Synopsis
 
-This header-only library contains class for interfacing Bitfinex REST API v1.
+This header-only library contains class for interfacing Bitfinex REST API v1. Current version supports response JSON
+schema validation.
 
 ### Installation
 
-Just copy content of `include/` directory into your project's `include/` directory and
+1. Copy content of `include/` directory into your project's `include/` directory and
 add `#include "bfx-api-cpp/BitfinexAPI.hpp"` in your `.cpp` file.
+
+2. Copy `doc/` directory with configuration files into your project.
 
 ### Usage
 
@@ -50,9 +53,12 @@ See self-explanatory `src/example.cpp` for general usage and more requests.
 
 ### ToDo
 
-- [ ] Integrating RapidJSON
 - [ ] Unit tests
-- [ ] JSON Scheme validation
+- [x] JSON Scheme validation
+
+### Change Log
+
+- 2018-07-11 Schema validation logic complete. Client currently validates public requests only.
 
 ### Author
 

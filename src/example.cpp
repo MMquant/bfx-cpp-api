@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
     //  bfxAPI.getTicker("btcusd");
     //  bfxAPI.getStats("btcusd");
     //  bfxAPI.getFundingBook("USD", 50, 50);
-    //  bfxAPI.getOrderBook("btcusd", 50, 50, 1);
+    //  bfxAPI.getOrderBook("btcusd", 50, 50, true);
     //  bfxAPI.getTrades("btcusd", 0L, 50);
     //  bfxAPI.getLends("USD", 0L, 50);
     //  bfxAPI.getSymbols();
-    //  bfxAPI.getSymbolDetails();
+    //  bfxAPI.getSymbolsDetails();
     
     ////////////////////////////////////////////////////////////////////////////
     ///  Available authenticated requests
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     //  bfxAPI.getAccountInfo();
     //  bfxAPI.getAccountFees();
     //  bfxAPI.getSummary();
-    //  bfxAPI.deposit("bitcoin", "deposit", 1);
+    //  bfxAPI.deposit("bitcoin", "deposit", true);
     //  bfxAPI.getKeyPermissions();
     //  bfxAPI.getMarginInfos();
     //  bfxAPI.getBalances();
@@ -88,8 +88,16 @@ int main(int argc, char *argv[])
     //  bfxAPI.withdraw(); // configure withdraw.conf file before use
     
     ///  Orders  ///
-    //  bfxAPI.newOrder("btcusd", 0.01, 983, "sell", "exchange limit", 0, 1,
-    //                           0, 0, 0);
+    //  bfxAPI.newOrder("btcusd",
+    //                  0.01,
+    //                  983,
+    //                  "sell",
+    //                  "exchange limit",
+    //                  false,
+    //                  true,
+    //                  false,
+    //                  false,
+    //                  0);
     //
     //  How to create vOrders object for newOrders() call
     //  BitfinexAPI::vOrders orders =
@@ -112,8 +120,14 @@ int main(int argc, char *argv[])
     //  bfxAPI.cancelOrders(ids);
     //
     //  bfxAPI.cancelAllOrders();
-    //  bfxAPI.replaceOrder(1321548521LL, "btcusd", 0.05, 1212, "sell",
-    //                                "exchange limit", 0, 0);
+    //  bfxAPI.replaceOrder(1321548521LL,
+    //                      "btcusd",
+    //                      0.05,
+    //                      1212,
+    //                      "sell",
+    //                      "exchange limit",
+    //                      false,
+    //                      false);
     //  bfxAPI.getOrderStatus(12113548453LL);
     //  bfxAPI.getActiveOrders();
     //  bfxAPI.getOrdersHistory(10);
@@ -125,7 +139,7 @@ int main(int argc, char *argv[])
     ///  Historical data  ///
     //  bfxAPI.getBalanceHistory("USD", 0L, 0L, 500, "all");
     //  bfxAPI.getWithdrawalHistory("BTC", "all", 0L , 0L, 500);
-    //  bfxAPI.getPastTrades("btcusd", 0L, 0L, 500, 0);
+    //  bfxAPI.getPastTrades("btcusd", 0L, 0L, 500, false);
     
     ///  Margin funding  ///
     //  bfxAPI.newOffer("USD", 12000, 25.2, 30, "lend");

@@ -1041,13 +1041,13 @@ namespace BfxAPI
             }
         };
         
-        void doPOSTrequest(const string &UrlEndPoint, const string &params)
+        void doPOSTrequest(const string &apiEndPoint, const string &params)
         {
             bfxApiStatusCode_ = noError;
             
             if(curlPOST_)
             {
-                string url = APIurl_ + UrlEndPoint;
+                string url = APIurl_ + apiEndPoint;
                 string payload;
                 string signature;
                 getBase64(params, payload);
@@ -1082,11 +1082,21 @@ namespace BfxAPI
                 {
                     cerr << "Libcurl error in doPOSTrequest():\n";
                     cerr << "CURLcode: " << curlStatusCode_ << "\n";
+                    bfxApiStatusCode_ = curlERR;
+                }
+                // Check schema
+                else
+                {
+                    bfxApiStatusCode_ =
+                    schemaValidator_.validateSchema(apiEndPoint, result_);
                 }
                 
             }
             else
+            {
                 cerr << "curl not properly initialized curlPOST_ = nullptr";
+                bfxApiStatusCode_ = curlERR;
+            }
         };
         
         ////////////////////////////////////////////////////////////////////////
@@ -1156,7 +1166,8 @@ namespace BfxAPI
                                     size_t nmemb,
                                     void *userp) noexcept
         {
-            (static_cast<string*>(userp))->append(static_cast<char*>(response));
+            (static_cast<string*>(userp))->
+            append(static_cast<char*>(response), size * nmemb);
             return size * nmemb;
         };
         
