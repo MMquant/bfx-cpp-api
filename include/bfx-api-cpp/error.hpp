@@ -20,5 +20,7 @@ enum bfxERR
     addressParamsMissing,   // 8
     badOrderType,           // 9
     jsonStrToUSetError,     // 10
-    badWDconfFilePath       // 11
+    badWDconfFilePath,      // 11
+    responseParseError,     // 12
+    responseSchemaError     // 13
 };

@@ -7,6 +7,14 @@
       "type": "string"
     }
   },
+  "symbols": {
+    "description": "JSON schema used in https://api.bitfinex.com/v1/symbols/ endpoint",
+    "type": "array",
+    "items": {
+      "type": "string"
+    },
+    "uniqueItems": false
+  },
   "pubticker": {
     "description": "JSON schema used in https://api.bitfinex.com/v1/pubticker/ endpoint",
     "type": "object",

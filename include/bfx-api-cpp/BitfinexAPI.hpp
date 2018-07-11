@@ -137,6 +137,9 @@ namespace BfxAPI
                 "XRP",
                 "ZEC"
             };
+            
+            schemaValidator_ = jsonutils::BfxSchemaValidator(symbols_, currencies_);
+            
             // As found on
             // https://bitfinex.readme.io/v1/reference#rest-auth-deposit
             methods_ =
@@ -152,10 +155,12 @@ namespace BfxAPI
                 "tetheruso",
                 "zcash",
             };
+            
             walletNames_ =
             {
                 "trading", "exchange", "deposit"
             };
+            
             // New order endpoint "type" parameter
             types_ =
             {
@@ -913,6 +918,8 @@ namespace BfxAPI
         CURL *curlGET_;
         CURL *curlPOST_;
         CURLcode curlStatusCode_;
+        // internal jsonutils instances
+        jsonutils::BfxSchemaValidator schemaValidator_;
         // BitfinexAPI settings
         string WDconfFilePath_;
         string APIurl_;
@@ -996,13 +1003,13 @@ namespace BfxAPI
             return noError;
         };
         
-        void doGETrequest(const string &UrlEndPoint, const string &params)
+        void doGETrequest(const string &apiEndPoint, const string &params)
         {
             bfxApiStatusCode_ = noError;
             
             if(curlGET_)
             {
-                string url = APIurl_ + UrlEndPoint + params;
+                string url = APIurl_ + apiEndPoint + params;
                 
                 result_.clear();
                 curl_easy_setopt(curlGET_, CURLOPT_TIMEOUT, CURL_TIMEOUT);
@@ -1018,10 +1025,20 @@ namespace BfxAPI
                 {
                     cerr << "libcurl error in doGETrequest():\n";
                     cerr << "CURLcode: " << curlStatusCode_ << "\n";
+                    bfxApiStatusCode_ = curlERR;
+                }
+                // Check schema
+                else
+                {
+                    bfxApiStatusCode_ =
+                    schemaValidator_.validateSchema(apiEndPoint, result_);
                 }
             }
             else
+            {
                 cerr << "curl not properly initialized curlGET_ = nullptr";
+                bfxApiStatusCode_ = curlERR;
+            }
         };
         
         void doPOSTrequest(const string &UrlEndPoint, const string &params)
