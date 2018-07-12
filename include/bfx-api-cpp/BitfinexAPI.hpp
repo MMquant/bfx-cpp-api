@@ -68,19 +68,19 @@ using CryptoPP::byte;
 
 namespace BfxAPI
 {
-    ////////////////////////////////////////////////////////////////////////
-    // Global variables
-    ////////////////////////////////////////////////////////////////////////
-    
-    const auto API_URL = "https://api.bitfinex.com/v1";
-    const auto CURL_TIMEOUT = 30L;
-    const auto CURL_DEBUG_VERBOSE = 0L;
-    const auto WITHDRAWAL_CONF_FILE_PATH = "doc/withdraw.conf";
-    
     
     class BitfinexAPI
     {
     public:
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Class constants
+        ////////////////////////////////////////////////////////////////////////
+        
+        static constexpr auto API_URL = "https://api.bitfinex.com/v1";
+        static constexpr auto CURL_TIMEOUT = 30L;
+        static constexpr auto CURL_DEBUG_VERBOSE = 0L;
+        static constexpr auto WITHDRAWAL_CONF_FILE_PATH = "doc/withdraw.conf";
         
         ////////////////////////////////////////////////////////////////////////
         // Typedefs
@@ -199,7 +199,7 @@ namespace BfxAPI
         const string getWDconfFilePath() const noexcept
             { return WDconfFilePath_; }
         
-        const bfxERR& getBfxApiStatusCode() const noexcept
+        const BfxClientErrors& getBfxApiStatusCode() const noexcept
             { return bfxApiStatusCode_; }
         
         const CURLcode& getCurlStatusCode() const noexcept
@@ -454,7 +454,7 @@ namespace BfxAPI
             getTonce() + "\"";
             
             // Add params from withdraw.conf
-            bfxERR code(parseWDconfParams(params));
+            BfxClientErrors code(parseWDconfParams(params));
             if (code != noError)
                 bfxApiStatusCode_ = code;
             else
@@ -925,14 +925,14 @@ namespace BfxAPI
         string APIurl_;
         string accessKey_, secretKey_;
         // dynamic and status variables
-        bfxERR bfxApiStatusCode_;
+        BfxClientErrors bfxApiStatusCode_;
         string result_;
         
         ////////////////////////////////////////////////////////////////////////
         // Utility private methods
         ////////////////////////////////////////////////////////////////////////
         
-        bfxERR parseWDconfParams(string &params)
+        BfxClientErrors parseWDconfParams(string &params)
         {
             using std::getline;
             using std::ifstream;

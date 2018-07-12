@@ -7,7 +7,7 @@
 
 #pragma once
 
-enum bfxERR
+enum BfxClientErrors
 {
     noError = 0,
     curlERR,                // 1

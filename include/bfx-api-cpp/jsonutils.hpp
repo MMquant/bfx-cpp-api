@@ -192,7 +192,7 @@ namespace jsonutils
                 cerr << "Invalid json - response:" << endl;
                 cerr << inputJson << endl;
                 cerr << "API endpoint: " << apiEndPoint << endl;
-                return bfxERR::responseParseError;
+                return BfxClientErrors::responseParseError;
             }
             
             // Create rapidjson validator and check for schema errors
@@ -210,10 +210,10 @@ namespace jsonutils
                 cerr << "Invalid document: " << sb.GetString() << endl;
                 cerr << "Invalid response: " << inputJson << endl;
                 cerr << "Invalid API endpoint: " << apiEndPoint << endl;
-                return bfxERR::responseSchemaError;
+                return BfxClientErrors::responseSchemaError;
             }
             
-            return bfxERR::noError;
+            return BfxClientErrors::noError;
         }
        
     private:
@@ -280,7 +280,7 @@ namespace jsonutils
     // Routines
     ////////////////////////////////////////////////////////////////////////////
     
-    bfxERR jsonStrToUset(unordered_set<string> &uSet, const string &inputJson)
+    BfxClientErrors jsonStrToUset(unordered_set<string> &uSet, const string &inputJson)
     {
         // Create schema $ref resolver
         rj::Document sd;
@@ -322,12 +322,12 @@ namespace jsonutils
                 cerr << "Invalid document: " << sb.GetString() << endl;
                 cerr << "Invalid response: " << inputJson << endl;
             }
-            return bfxERR::jsonStrToUSetError;
+            return BfxClientErrors::jsonStrToUSetError;
         }
         else
         {
             uSet.swap(handler.handlerUSet_);
-            return bfxERR::noError;
+            return BfxClientErrors::noError;
         }
     }
 }
