@@ -1003,7 +1003,7 @@ namespace BfxAPI
             return noError;
         };
         
-        void doGETrequest(const string &apiEndPoint, const string &params)
+        void doGETrequest(string &&apiEndPoint, const string &params)
         {
             bfxApiStatusCode_ = noError;
             
@@ -1041,7 +1041,7 @@ namespace BfxAPI
             }
         };
         
-        void doPOSTrequest(const string &apiEndPoint, const string &params)
+        void doPOSTrequest(string &&apiEndPoint, const string &params)
         {
             bfxApiStatusCode_ = noError;
             
