@@ -39,16 +39,18 @@ schema validation.
 	// Fetch data
 	bfxAPI.getTicker("btcusd");
 	
-   	// Check for errors
-  	if (!bfxAPI.hasApiError())
-   		// Get response in string
-   		cout << bfxAPI.strResponse() << endl;
-    else
-    {
-        // Inspect errors
-        cout << bfxAPI.getBfxApiStatusCode() << endl;
-        cout << bfxAPI.getCurlStatusCode() << endl;
-    }
+	// Check for errors
+	if (!bfxAPI.hasApiError())
+	{
+	    // Get response in string
+	    cout << bfxAPI.strResponse() << endl;
+	}
+	else
+	{
+	    // Inspect errors
+	    cout << bfxAPI.getBfxApiStatusCode() << endl;
+	    cout << bfxAPI.getCurlStatusCode() << endl;
+	}
 
 See self-explanatory `src/example.cpp` for general usage and more requests.
 
