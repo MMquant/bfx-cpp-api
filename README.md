@@ -23,9 +23,10 @@ schema validation.
 
 1. Install dependencies (via apt, homebrew etc.).
 2. Clone or download bfx-api-cpp repository.
-3. Peek into `<your_project_dir>/src/example.cpp`
-4. Create and run `Makefile` with `cd <your_project_dir>/build && cmake .. && make`.
-5. Run `example` executable `./example`.
+3. Peek into self-documented `<your_project_dir>/src/example.cpp`.
+4. Create `build` directory `$ mkdir <your_project_dir>/build`.
+5. Build `example` binary `$ cd <your_project_dir>/build && cmake .. && make`.
+6. Run `example` binary `$ ./example`.
 
 ### Usage
 
