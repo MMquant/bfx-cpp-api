@@ -61,7 +61,7 @@ using std::vector;
 
 
 // CRYPTOPP_NO_GLOBAL_BYTE signals byte is at CryptoPP::byte
-#if defined(CRYPTOPP_NO_GLOBAL_BYTE)
+#ifdef CRYPTOPP_NO_GLOBAL_BYTE
 using CryptoPP::byte;
 #endif
 
@@ -71,7 +71,6 @@ namespace BfxAPI
     
     class BitfinexAPI
     {
-    public:
         
         ////////////////////////////////////////////////////////////////////////
         // Class constants
@@ -80,7 +79,9 @@ namespace BfxAPI
         static constexpr auto API_URL = "https://api.bitfinex.com/v1";
         static constexpr auto CURL_TIMEOUT = 30L;
         static constexpr auto CURL_DEBUG_VERBOSE = 0L;
-        static constexpr auto WITHDRAWAL_CONF_FILE_PATH = "doc/withdraw.conf";
+        #ifndef WITHDRAWAL_CONF_FILE_PATH
+        static constexpr auto WITHDRAWAL_CONF_FILE_PATH = "withdraw.conf";
+        #endif
         
         ////////////////////////////////////////////////////////////////////////
         // Typedefs
@@ -97,6 +98,8 @@ namespace BfxAPI
         };
         using vOrders = vector<sOrder>;
         using vIds = vector<long long>;
+        
+    public:
         
         ////////////////////////////////////////////////////////////////////////
         // Constructor - Destructor
@@ -197,16 +200,16 @@ namespace BfxAPI
         
         // Getters
         const string getWDconfFilePath() const noexcept
-            { return WDconfFilePath_; }
+        { return WDconfFilePath_; }
         
         const BfxClientErrors& getBfxApiStatusCode() const noexcept
-            { return bfxApiStatusCode_; }
+        { return bfxApiStatusCode_; }
         
         const CURLcode& getCurlStatusCode() const noexcept
-            { return curlStatusCode_; }
+        { return curlStatusCode_; }
         
         const string& strResponse() const noexcept
-            { return result_ ; }
+        { return result_ ; }
         
         bool hasApiError() const noexcept
         {
@@ -218,7 +221,7 @@ namespace BfxAPI
         
         // Setters
         constexpr void setWDconfFilePath(const string &path) noexcept
-            { WDconfFilePath_ = path; }
+        { WDconfFilePath_ = path; }
         
         constexpr void setKeys(const string &accessKey, const string &secretKey) noexcept
         {
@@ -226,8 +229,8 @@ namespace BfxAPI
             secretKey_ = secretKey;
         }
         
-        constexpr string& getAccessKey() { return accessKey_;}
-        constexpr string& getSecretKey() { return secretKey_;}
+        constexpr string& getAccessKeyRef() { return accessKey_;}
+        constexpr string& getSecretKeyRef() { return secretKey_;}
         
         ////////////////////////////////////////////////////////////////////////
         // Public endpoints
@@ -377,10 +380,10 @@ namespace BfxAPI
                              const bool &renew = false)
         {
             if (!inArray(method, methods_))
-                { bfxApiStatusCode_ = badDepositMethod; return *this; }
-
+            { bfxApiStatusCode_ = badDepositMethod; return *this; }
+            
             if (!inArray(walletName, walletNames_))
-                { bfxApiStatusCode_ = badWalletType; return *this; }
+            { bfxApiStatusCode_ = badWalletType; return *this; }
             
             string params = "{\"request\":\"/v1/deposit/new\",\"nonce\":\"" +
             getTonce() + "\"";
@@ -429,11 +432,11 @@ namespace BfxAPI
                               const string &walletto)
         {
             if (!inArray(currency, currencies_))
-                { bfxApiStatusCode_ = badCurrency; return *this; }
-
+            { bfxApiStatusCode_ = badCurrency; return *this; }
+            
             if (!inArray(walletfrom, walletNames_) ||
-               !inArray(walletto, walletNames_))
-                { bfxApiStatusCode_ = badWalletType; return *this; }
+                !inArray(walletto, walletNames_))
+            { bfxApiStatusCode_ = badWalletType; return *this; }
             
             string params = "{\"request\":\"/v1/transfer\",\"nonce\":\"" +
             getTonce() + "\"";
@@ -669,14 +672,14 @@ namespace BfxAPI
         {
             // Is currency valid ?
             if (!inArray(currency, currencies_))
-                { bfxApiStatusCode_ = badCurrency; return *this; };
+            { bfxApiStatusCode_ = badCurrency; return *this; };
             
             // Is wallet type valid ?
             // Modified condition which accepts "all" value for all wallets
             // balances together.If "all" specified then there is simply no
             // wallet parameter in POST request.
             if (!inArray(walletType, walletNames_) || walletType != "all")
-                { bfxApiStatusCode_ = badWalletType; return *this; };
+            { bfxApiStatusCode_ = badWalletType; return *this; };
             
             string params = "{\"request\":\"/v1/history\",\"nonce\":\"" +
             getTonce() + "\"";
@@ -700,10 +703,10 @@ namespace BfxAPI
                                           const unsigned &limit = 500)
         {
             if (!inArray(currency, currencies_))
-                { bfxApiStatusCode_ = badCurrency; return *this; };
+            { bfxApiStatusCode_ = badCurrency; return *this; };
             
             if (!inArray(method, methods_) && method != "wire" && method != "all")
-                { bfxApiStatusCode_ = badDepositMethod; return *this; };
+            { bfxApiStatusCode_ = badDepositMethod; return *this; };
             
             string params = "{\"request\":\"/v1/history/movements\",\"nonce\":\""
             + getTonce() + "\"";
@@ -712,7 +715,7 @@ namespace BfxAPI
                 params += ",\"method\":\"" + method + "\"";
             params += ",\"since\":\"" + to_string(since) + "\"";
             params += ",\"until\":\"" +
-                (!until ? getTonce() : to_string(until)) + "\"";
+            (!until ? getTonce() : to_string(until)) + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
             doPOSTrequest("/history/movements/", params);
@@ -730,16 +733,16 @@ namespace BfxAPI
                 bfxApiStatusCode_ = badSymbol;
             else
             {
-            string params = "{\"request\":\"/v1/mytrades\",\"nonce\":\"" +
-                            getTonce() + "\"";
-            params += ",\"symbol\":\"" + symbol + "\"";
-            params += ",\"timestamp\":\"" + to_string(timestamp) + "\"";
-            params += ",\"until\":\"" +
+                string params = "{\"request\":\"/v1/mytrades\",\"nonce\":\"" +
+                getTonce() + "\"";
+                params += ",\"symbol\":\"" + symbol + "\"";
+                params += ",\"timestamp\":\"" + to_string(timestamp) + "\"";
+                params += ",\"until\":\"" +
                 (!until ? getTonce() : to_string(until)) + "\"";
-            params += ",\"limit_trades\":" + to_string(limit_trades);
-            params += ",\"reverse\":" + to_string(reverse);
-            params += "}";
-            doPOSTrequest("/mytrades/", params);
+                params += ",\"limit_trades\":" + to_string(limit_trades);
+                params += ",\"reverse\":" + to_string(reverse);
+                params += "}";
+                doPOSTrequest("/mytrades/", params);
             }
             
             return *this;
@@ -756,15 +759,15 @@ namespace BfxAPI
                 bfxApiStatusCode_ = badCurrency;
             else
             {
-            string params = "{\"request\":\"/v1/offer/new\",\"nonce\":\"" +
-                            getTonce() + "\"";
-            params += ",\"currency\":\"" + currency + "\"";
-            params += ",\"amount\":\"" + to_string(amount) + "\"";
-            params += ",\"rate\":\"" + to_string(rate) + "\"";
-            params += ",\"period\":" + to_string(period);
-            params += ",\"direction\":\"" + direction + "\"";
-            params += "}";
-            doPOSTrequest("/offer/new/", params);
+                string params = "{\"request\":\"/v1/offer/new\",\"nonce\":\"" +
+                getTonce() + "\"";
+                params += ",\"currency\":\"" + currency + "\"";
+                params += ",\"amount\":\"" + to_string(amount) + "\"";
+                params += ",\"rate\":\"" + to_string(rate) + "\"";
+                params += ",\"period\":" + to_string(period);
+                params += ",\"direction\":\"" + direction + "\"";
+                params += "}";
+                doPOSTrequest("/offer/new/", params);
             }
             
             return  *this;
@@ -773,7 +776,7 @@ namespace BfxAPI
         BitfinexAPI& cancelOffer(const long long &offer_id)
         {
             string params = "{\"request\":\"/v1/offer/cancel\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += ",\"offer_id\":" + to_string(offer_id);
             params += "}";
             doPOSTrequest("/offer/cancel/", params);
@@ -784,7 +787,7 @@ namespace BfxAPI
         BitfinexAPI& getOfferStatus(const long long &offer_id)
         {
             string params = "{\"request\":\"/v1/offer/status\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += ",\"offer_id\":" + to_string(offer_id);
             params += "}";
             doPOSTrequest("/offer/status/", params);
@@ -795,7 +798,7 @@ namespace BfxAPI
         BitfinexAPI& getActiveCredits()
         {
             string params = "{\"request\":\"/v1/credits\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += "}";
             doPOSTrequest("/credits/", params);
             
@@ -805,7 +808,7 @@ namespace BfxAPI
         BitfinexAPI& getOffers()
         {
             string params = "{\"request\":\"/v1/offers\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += "}";
             doPOSTrequest("/offers/", params);
             
@@ -815,7 +818,7 @@ namespace BfxAPI
         BitfinexAPI& getOffersHistory(const unsigned &limit)
         {
             string params = "{\"request\":\"/v1/offers/hist\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += ",\"limit\":" + to_string(limit);
             params += "}";
             doPOSTrequest("/offers/hist/", params);
@@ -838,7 +841,7 @@ namespace BfxAPI
             else
             {
                 string params = "{\"request\":\"/v1/mytrades_funding\",\"nonce\":\""
-                                + getTonce() + "\"";
+                + getTonce() + "\"";
                 // param inconsistency in BFX API, "symbol" should be currency
                 params += ",\"symbol\":\"" + currency + "\"";
                 params += ",\"until\":" + to_string(until);
@@ -853,7 +856,7 @@ namespace BfxAPI
         BitfinexAPI& getTakenFunds()
         {
             string params = "{\"request\":\"/v1/taken_funds\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += "}";
             doPOSTrequest("/taken_funds/", params);
             
@@ -863,7 +866,7 @@ namespace BfxAPI
         BitfinexAPI& getUnusedTakenFunds()
         {
             string params = "{\"request\":\"/v1/unused_taken_funds\",\"nonce\":\""
-                            + getTonce() + "\"";
+            + getTonce() + "\"";
             params += "}";
             doPOSTrequest("/unused_taken_funds/", params);
             
@@ -873,7 +876,7 @@ namespace BfxAPI
         BitfinexAPI& getTotalTakenFunds()
         {
             string params = "{\"request\":\"/v1/total_taken_funds\",\"nonce\":\""
-                            + getTonce() + "\"";
+            + getTonce() + "\"";
             params += "}";
             doPOSTrequest("/total_taken_funds/", params);
             
@@ -883,7 +886,7 @@ namespace BfxAPI
         BitfinexAPI& closeLoan(const long long &offer_id)
         {
             string params = "{\"request\":\"/v1/funding/close\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += ",\"swap_id\":" + to_string(offer_id);
             params += "}";
             doPOSTrequest("/funding/close/", params);
@@ -894,7 +897,7 @@ namespace BfxAPI
         BitfinexAPI& closePosition(const long long &position_id)
         {
             string params = "{\"request\":\"/v1/position/close\",\"nonce\":\"" +
-                            getTonce() + "\"";
+            getTonce() + "\"";
             params += ",\"position_id\":" + to_string(position_id);
             params += "}";
             doPOSTrequest("/position/close/", params);
@@ -914,16 +917,16 @@ namespace BfxAPI
         unordered_set<string> methods_; // valid deposit methods
         unordered_set<string> walletNames_; // valid walletTypes
         unordered_set<string> types_; // valid Types (see new order endpoint)
+        // BitfinexAPI settings
+        string accessKey_, secretKey_;
+        string WDconfFilePath_;
+        string APIurl_;
         // CURL instances
         CURL *curlGET_;
         CURL *curlPOST_;
         CURLcode curlStatusCode_;
         // internal jsonutils instances
         jsonutils::BfxSchemaValidator schemaValidator_;
-        // BitfinexAPI settings
-        string WDconfFilePath_;
-        string APIurl_;
-        string accessKey_, secretKey_;
         // dynamic and status variables
         BfxClientErrors bfxApiStatusCode_;
         string result_;

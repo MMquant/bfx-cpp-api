@@ -43,11 +43,16 @@ namespace jsonutils
     /// Helper class resolving remote schema for schema $ref operator
     class MyRemoteSchemaDocumentProvider: public rj::IRemoteSchemaDocumentProvider
     {
+        
+        #ifndef JSON_DEFINITIONS_FILE_PATH
+        static constexpr auto JSON_DEFINITIONS_FILE_PATH = "definitions.json";
+        #endif
+        
     public:
         
         MyRemoteSchemaDocumentProvider()
         {
-            FILE *pFileIn = fopen("doc/definitions.json", "r"); // non-Windows use "r"
+            FILE *pFileIn = fopen(JSON_DEFINITIONS_FILE_PATH, "r"); // non-Windows use "r"
             char readBuffer[65536];
             rj::FileReadStream fReadStream(pFileIn, readBuffer, sizeof(readBuffer));
             rj::Document d;
@@ -56,10 +61,10 @@ namespace jsonutils
             remoteSchemaDoc_ = new rj::SchemaDocument(d);
         };
         
-//        ~MyRemoteSchemaDocumentProvider()
-//        {
-//            delete remoteSchemaDoc_;
-//        };
+        //        ~MyRemoteSchemaDocumentProvider()
+        //        {
+        //            delete remoteSchemaDoc_;
+        //        };
         
     private:
         
@@ -215,7 +220,7 @@ namespace jsonutils
             
             return BfxClientErrors::noError;
         }
-       
+        
     private:
         
         MyRemoteSchemaDocumentProvider provider_;

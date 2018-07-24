@@ -31,14 +31,14 @@ int main(int argc, char *argv[])
     // BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
     
     // Load API keys from file
-    ifstream ifs("doc/key-secret", ifstream::in);
+    ifstream ifs("../doc/key-secret", ifstream::in);
     if (!ifs.is_open())
     {
         cerr << "Can't open 'key-secret' file. " << endl;
         return 1;
     }
-    getline(ifs, bfxAPI.getAccessKey());
-    getline(ifs, bfxAPI.getSecretKey());
+    getline(ifs, bfxAPI.getAccessKeyRef());
+    getline(ifs, bfxAPI.getSecretKeyRef());
     ifs.close();
     
     // Fetch API

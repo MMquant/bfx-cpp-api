@@ -1,6 +1,4 @@
-# bfx-cpp-api
-
-_C++ Bitfinex REST API client_
+![bfx-cpp-api logo](doc/logo/bfx-cpp-api_logo.png)
 
 ***
 
@@ -13,12 +11,21 @@ _C++ Bitfinex REST API client_
 This header-only library contains class for interfacing Bitfinex REST API v1. Current version supports response JSON
 schema validation.
 
-### Installation
+### Dependencies
 
-1. Copy content of `include/` directory into your project's `include/` directory and
-add `#include "bfx-api-cpp/BitfinexAPI.hpp"` in your `.cpp` file.
+*bfx-cpp-api* depends on following external libraries
 
-2. Copy `doc/` directory with configuration files into your project.
+* cmake - [https://cmake.org/download/](https://cmake.org/download/)
+* libcryptopp - [https://www.cryptopp.com/](https://www.cryptopp.com/)
+* libcurl - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
+
+### How to Build'n'Run `src/example.cpp`
+
+1. Install dependencies (via apt, homebrew etc.).
+2. Clone or download bfx-api-cpp repository.
+3. Peek into `<your_project_dir>/src/example.cpp`
+4. Create and run `Makefile` with `cd <your_project_dir>/build && cmake .. && make`.
+5. Run `example` executable `./example`.
 
 ### Usage
 
@@ -44,20 +51,9 @@ add `#include "bfx-api-cpp/BitfinexAPI.hpp"` in your `.cpp` file.
 
 See self-explanatory `src/example.cpp` for general usage and more requests.
 
-### Dependencies
-
-*bfx-cpp-api* depends on following external libraries
-
-* libcryptopp - [https://www.cryptopp.com/](https://www.cryptopp.com/)
-* libcurl - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
-
-### ToDo
-
-- [ ] Unit tests
-- [x] JSON Scheme validation
-
 ### Change Log
 
+- 2018-07-24 CMakeLists.txt added. Installation instructions changed.
 - 2018-07-11 Schema validation logic complete. Client currently validates public requests only.
 
 ### Author
