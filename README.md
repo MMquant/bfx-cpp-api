@@ -2,6 +2,15 @@
 
 ***
 
+### Build status
+
+| [Linux][lin-link] |
+| :---------------: |
+| ![lin-badge]      |
+
+[lin-badge]: https://circleci.com/gh/MMquant/bfx-cpp-api/tree/master.svg?style=svg "CircleCI build status"
+[lin-link]:  https://circleci.com/gh/MMquant/bfx-cpp-api "CircleCI build status"
+
 ### Notice
 
 ***Master*** branch contains new version of the client. For old version checkout ***legacy*** branch.
