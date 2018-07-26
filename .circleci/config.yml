@@ -1,30 +1,15 @@
 version: 2
 jobs:
-    run_cmake:
-        docker:
-            - image: circleci/python:3.7.0-stretch-browsers
-        steps:
-            - checkout
-            - run:
-                name: Install cmake
-                command: sudo apt install cmake
-            - run:
-                name: Create build/ dir and Makefile
-                command: |
-                    mkdir -p build && cd build && cmake ..
-    build:
-        docker:
-            - image: circleci/python:3.7.0-stretch-browsers
-        steps:
-            - checkout
-            - run:
-                name: Build project
-                command: cd build && make
-workflows:
-    version: 2
-        build_project:
-            jobs:
-                - run_cmake
-                - build:
-                    requires:
-                        - run_cmake
+  build:
+    docker:
+      - image: circleci/buildpack-deps:stretch-curl-browsers
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            ./.circleci/install_deps.sh
+      - run:
+          name: Build project
+          command: |
+            echo "Hello world"
