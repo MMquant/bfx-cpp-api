@@ -17,7 +17,7 @@ jobs:
             - ".git"
 
       - restore_cache:
-          keys: custom_deps_tar_checksum-{{ checksum "custom_deps" }}
+          keys: custom_deps_tar_checksum-{{ checksum "custom_deps.tar" }}
 
       - run:
           name: Install dependencies to ~/custom_deps directory
@@ -26,7 +26,7 @@ jobs:
             tar -cf custom_deps.tar custom_deps
 
       - save_cache:
-          key: custom_deps_tar_checksum-{{ checksum "custom_deps" }}
+          key: custom_deps_tar_checksum-{{ checksum "custom_deps.tar" }}
           paths:
             - ~/custom_deps
       

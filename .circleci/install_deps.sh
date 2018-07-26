@@ -6,7 +6,7 @@ mkdir $HOME/custom_deps
 cd $HOME/custom_deps
 echo "~/Adding custom_deps in $PATH"
 export PATH=$PATH:$HOME/custom_deps
-if ! [[ $HOME/custom_deps == *"$PATH"* ]]; then
+if [[ $HOME/custom_deps != *"$PATH"* ]]; then
     echo "Couldn't add custom_deps dir to $PATH"
     exit 1
 fi
