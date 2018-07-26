@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
 # This script establishes custom dependencies directory.
+echo "Creating ~/custom_deps directory"
 mkdir $HOME/custom_deps
-export PATH=$PATH:$HOME/custom_deps
 cd $HOME/custom_deps
-echo "~/custom_deps directory successfully created"
+echo "~/Adding custom_deps in $PATH"
+export PATH=$PATH:$HOME/custom_deps
+if ! [[ $HOME/custom_deps == *"$PATH"* ]]; then
+    echo "Couldn't add custom_deps dir to $PATH"
+    exit 1
+fi
 
 # CMake
 echo "Installing CMake..."
