@@ -4,11 +4,31 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:stretch-curl-browsers
     steps:
+      - restore_cache:
+          keys:
+            - source-{{ .Branch }}-{{ .Revision }}
+      
       - checkout
+      
+      - save_cache:
+          key: source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+
+      - restore_cache:
+          keys: custom_deps_tar_checksum-{{ checksum "custom_deps" }}
+
       - run:
           name: Install dependencies to ~/custom_deps directory
           command: |
             ./.circleci/install_deps.sh
+            tar -cf custom_deps.tar custom_deps
+
+      - save_cache:
+          keys: custom_deps_tar_checksum-{{ checksum "custom_deps" }}
+          paths:
+            - ~/custom_deps
+      
       - run:
           name: Build project
           command: |
