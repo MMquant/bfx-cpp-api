@@ -4,10 +4,10 @@
 echo "Creating ~/custom_deps directory"
 mkdir $HOME/custom_deps
 cd $HOME/custom_deps
-echo "~/Adding custom_deps in $PATH"
+echo "~/Adding custom_deps in \$PATH"
 export PATH=$PATH:$HOME/custom_deps
-if [[ $HOME/custom_deps != *"$PATH"* ]]; then
-    echo "Couldn't add custom_deps dir to $PATH"
+if [[ $PATH != *"$HOME/custom_deps"* ]]; then
+    echo "Couldn't add custom_deps dir in $PATH"
     exit 1
 fi
 
