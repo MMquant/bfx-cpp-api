@@ -24,7 +24,7 @@ jobs:
           name: Install dependencies to ~/custom_deps directory
           command: |
             ./.circleci/install_deps.sh
-            tar -cf custom_deps.tar custom_deps
+            tar -cf custom_deps.tar ~/custom_deps
 
       - save_cache:
           key: custom_deps_tar_checksum-{{ checksum "custom_deps.tar" }}
@@ -32,6 +32,14 @@ jobs:
             - ~/custom_deps
       
       - run:
+          name: Install apt dependencies
+          command: |
+            sudo apt-get install build-essential
+            sudo apt-get install libcurl4-gnutls-dev
+            sudo apt-get install libcrypto++6
+
+      - run:
           name: Build project
           command: |
+            export PATH=$PATH:~/custom_deps
             mkdir build && cd build && cmake .. && make 
