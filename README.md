@@ -22,11 +22,13 @@ schema validation.
 
 ### Dependencies
 
-*bfx-cpp-api* depends on following external libraries
+*bfx-cpp-api* depends on following external libraries/packages
 
 * cmake - [https://cmake.org/download/](https://cmake.org/download/)
-* libcryptopp - [https://www.cryptopp.com/](https://www.cryptopp.com/)
-* libcurl - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
+* libcrypto++ - [https://www.cryptopp.com/](https://www.cryptopp.com/)
+* libcrypto++-dev - [https://www.cryptopp.com/](https://www.cryptopp.com/)
+* curl - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
+* libcurl4-gnutls-dev or libcurl4-openssl-dev - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
 
 ### How to Build'n'Run `src/example.cpp`
 
@@ -67,6 +69,10 @@ See self-explanatory `src/example.cpp` for general usage and more requests.
 
 - 2018-07-24 CMakeLists.txt added. Installation instructions changed.
 - 2018-07-11 Schema validation logic complete. Client currently validates public requests only.
+
+### Known issues
+
+You will not be able to compile *bfx-cpp-api* with GCC<7.2 due to this [bug](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66297).
 
 ### Author
 

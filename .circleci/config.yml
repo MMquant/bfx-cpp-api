@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/buildpack-deps:stretch-curl-browsers
+      - image: mmquant/cpp_dev:deb9.5
     steps:
       
       - restore_cache:
@@ -17,29 +17,7 @@ jobs:
           paths:
             - ".git"
 
-      - restore_cache:
-          keys: custom_deps_tar_checksum-{{ checksum "custom_deps.tar" }}
-
-      - run:
-          name: Install dependencies to ~/custom_deps directory
-          command: |
-            ./.circleci/install_deps.sh
-            tar -cf custom_deps.tar ~/custom_deps
-
-      - save_cache:
-          key: custom_deps_tar_checksum-{{ checksum "custom_deps.tar" }}
-          paths:
-            - ~/custom_deps
-      
-      - run:
-          name: Install apt dependencies
-          command: |
-            sudo apt-get install build-essential
-            sudo apt-get install libcurl4-gnutls-dev
-            sudo apt-get install libcrypto++6
-
       - run:
           name: Build project
           command: |
-            export PATH=$PATH:~/custom_deps
             mkdir build && cd build && cmake .. && make 
