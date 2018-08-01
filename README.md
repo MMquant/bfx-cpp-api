@@ -24,22 +24,71 @@ schema validation.
 
 *bfx-cpp-api* depends on following external libraries/packages
 
-* cmake - [https://cmake.org/download/](https://cmake.org/download/)
-* libcrypto++ - [https://www.cryptopp.com/](https://www.cryptopp.com/)
-* libcrypto++-dev - [https://www.cryptopp.com/](https://www.cryptopp.com/)
-* curl - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
-* libcurl4-gnutls-dev or libcurl4-openssl-dev - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
+* *cmake* - [https://cmake.org/download/](https://cmake.org/download/)
+* *libcrypto++* - [https://www.cryptopp.com/](https://www.cryptopp.com/)
+* *libcrypto++-dev* - [https://www.cryptopp.com/](https://www.cryptopp.com/)
+* *curl* - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
+* *libcurl4-gnutls-dev* or *libcurl4-openssl-dev* - [https://curl.haxx.se/download.html](https://curl.haxx.se/download.html)
+* *gcc* > 7.2 or C++14 compatible *clang*
 
 ### How to Build'n'Run `src/example.cpp`
 
 1. Install dependencies (via apt, homebrew etc.).
-2. Clone or download bfx-api-cpp repository.
-3. Peek into self-documented `<your_project_dir>/src/example.cpp`.
-4. Create `build` directory `$ mkdir <your_project_dir>/build`.
-5. Build `example` binary `$ cd <your_project_dir>/build && cmake .. && make`.
-6. Run `example` binary `$ ./example`.
+2. Clone or download *bfx-api-cpp* repository.
+3. Add `key-secret` file in `bfx-api-cpp/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
+4. Peek into self-documented `<your_project_dir>/src/example.cpp`.
+5. Create `build` directory
 
-### Usage
+ `$ mkdir <your_project_dir>/build`
+
+6. Build `example` binary
+
+ `$ cd <your_project_dir>/build && cmake .. && make`
+ 
+7. Run `example` binary
+
+ `$ ./example`
+
+### How to Build'n'Run `src/example.cpp` in Docker container
+
+Alternatively you can build `example.cpp` in custom `mmquant/dev_cpp:deb9.5` Docker container with all dependecies preinstalled. (This image is used also by CircleCI builds). This image is for development purposes only - do not use it in production.
+
+1. Pull the image from Docker cloud
+
+ `$ docker pull mmquant/cpp_dev:deb9.5`
+
+2. Create container
+
+  `$ docker run -dit mmquant/cpp_dev:deb9.5`
+  
+3. Spawn bash
+
+  `$ docker exec -it <container ID> /bin/bash`
+  
+4. Clone *bfx-cpp-api* repository into the container
+
+ `# mkdir ~/project && cd ~/project && git clone https://github.com/MMquant/bfx-cpp-api.git`
+ 
+5. Add `key-secret` file in `bfx-api-cpp/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
+
+ ```
+ # echo <key> > key-secret  
+ # echo <secret> >> key-secret
+ ```
+
+6. Build `example.cpp`
+
+	```
+	# mkdir ~/project/bfx-cpp-api/build
+	# cd ~/project/bfx-cpp-api/build
+	# cmake .. && make
+	```
+7. Run `example` binary
+
+  `$ ./example`
+
+
+### Quick interface overview
 
 	// Create API client for both authenticated and unauthenticated requests
 	BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
@@ -67,6 +116,7 @@ See self-explanatory `src/example.cpp` for general usage and more requests.
 
 ### Change Log
 
+- 2018-08-01 Dockerfile added. CircleCI added.
 - 2018-07-24 CMakeLists.txt added. Installation instructions changed.
 - 2018-07-11 Schema validation logic complete. Client currently validates public requests only.
 
