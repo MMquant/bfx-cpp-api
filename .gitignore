@@ -1,6 +1,5 @@
 .DS_Store
 app/bin/
-app/build/
 DerivedData/
 bfx-cpp-api.xcodeproj/
 include/.DS_Store
