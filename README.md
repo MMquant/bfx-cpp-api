@@ -40,13 +40,13 @@ schema validation.
 5. Build `example` binary
 
 ```BASH
-	cd <your_project_dir>app/build && cmake .. && make
+cd <your_project_dir>app/build && cmake .. && make
 ```
 
 7. Run `example` binary from `<your_project_dir>app/bin`
 
 ```BASH
-	./example
+./example
 ```
 
 ### How to Build'n'Run `src/example.cpp` in Docker container
@@ -55,69 +55,69 @@ schema validation.
 2. Build docker image
 
 ```BASH
-	cd <your_project_dir>
-	docker-compose build
+cd <your_project_dir>
+docker-compose build
 ```
 
 3. Start docker image
 
 ```BASH
-	docker-compose up &
+docker-compose up &
 ```
 
 4. Spawn bash
 
 ```BASH
-	docker exec -it bfx-cpp-api_dev_1 /bin/sh
+docker exec -it bfx-cpp-api_dev_1 /bin/sh
 ```
 
 5. Add `key-secret` file in `/home/bfx-cpp-api/app/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
 
 ```BASH
-	cd /home/bfx-cpp-api/app/doc
-	echo <key> > key-secret
-	echo <secret> >> key-secret
+cd /home/bfx-cpp-api/app/doc
+echo <key> > key-secret
+echo <secret> >> key-secret
 ```
 
 6. Build example
 
 ```BASH
-	cd /home/bfx-cpp-api/app/build
-	cmake ..
-	make
+cd /home/bfx-cpp-api/app/build
+cmake ..
+make
 ```
 
 7. Run `example` binary
 
 ```BASH
-	cd /home/bfx-cpp-api/app/bin
-  ./example
+cd /home/bfx-cpp-api/app/bin
+./example
 ```
 
 ### Quick interface overview
 
 ```C++
-	// Create API client for both authenticated and unauthenticated requests
-	BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
+// Create API client for both authenticated and unauthenticated requests
+BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
 
-	// Create API client for just unauthenticated requests
-	BfxAPI::BitfinexAPI bfxAPI();
+// Create API client for just unauthenticated requests
+BfxAPI::BitfinexAPI bfxAPI();
 
-	// Fetch data
-	bfxAPI.getTicker("btcusd");
+// Fetch data
+bfxAPI.getTicker("btcusd");
 
-	// Check for errors
-	if (!bfxAPI.hasApiError())
-	{
-	    // Get response in string
-	    cout << bfxAPI.strResponse() << endl;
-	}
-	else
-	{
-	    // Inspect errors
-	    cout << bfxAPI.getBfxApiStatusCode() << endl;
-	    cout << bfxAPI.getCurlStatusCode() << endl;
-	}
+// Check for errors
+if (!bfxAPI.hasApiError())
+{
+    // Get response in string
+    cout << bfxAPI.strResponse() << endl;
+}
+else
+{
+    // Inspect errors
+    cout << bfxAPI.getBfxApiStatusCode() << endl;
+    cout << bfxAPI.getCurlStatusCode() << endl;
+}
 ```
 
 See self-explanatory `src/example.cpp` for general usage and more requests.
