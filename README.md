@@ -35,82 +35,82 @@ schema validation.
 
 1. Install dependencies (via apt, homebrew etc.).
 2. Clone or download *bfx-api-cpp* repository.
-3. Add `key-secret` file in `bfx-api-cpp/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
-4. Peek into self-documented `<your_project_dir>/src/example.cpp`.
-5. Create `build` directory
+3. Add `key-secret` file in `bfx-api-cpp/app/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
+4. Peek into self-documented `<your_project_dir>app/src/example.cpp`.
+5. Build `example` binary
 
- `$ mkdir <your_project_dir>/build`
+ `$ cd <your_project_dir>app/build && cmake .. && make`
 
-6. Build `example` binary
-
- `$ cd <your_project_dir>/build && cmake .. && make`
- 
-7. Run `example` binary
+7. Run `example` binary from `<your_project_dir>app/bin`
 
  `$ ./example`
 
 ### How to Build'n'Run `src/example.cpp` in Docker container
 
-Alternatively you can build `example.cpp` in custom `mmquant/dev_cpp:deb9.5` Docker container with all dependecies preinstalled. (This image is used also by CircleCI builds). This image is for development purposes only - do not use it in production.
+1. Clone or download *bfx-api-cpp* repository.
+2. Build docker image
 
-1. Pull the image from Docker cloud
-
- `$ docker pull mmquant/cpp_dev:deb9.5`
-
-2. Create container
-
-  `$ docker run -dit mmquant/cpp_dev:deb9.5`
-  
-3. Spawn bash
-
-  `$ docker exec -it <container ID> /bin/bash`
-  
-4. Clone *bfx-cpp-api* repository into the container
-
- `# mkdir ~/project && cd ~/project && git clone https://github.com/MMquant/bfx-cpp-api.git`
- 
-5. Add `key-secret` file in `bfx-api-cpp/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
-
- ```
- # echo <key> > key-secret  
- # echo <secret> >> key-secret
- ```
-
-6. Build `example.cpp`
-
+	```BASH
+	cd <your_project_dir>
+	docker-compose build
 	```
-	# mkdir ~/project/bfx-cpp-api/build
-	# cd ~/project/bfx-cpp-api/build
-	# cmake .. && make
-	```
-7. Run `example` binary
 
-  `$ ./example`
+3. Start docker image
 
+  `$ docker-compose up &`
+
+4. Spawn bash
+
+  `$ docker exec -it bfx-cpp-api_dev_1 /bin/sh`
+
+5. Add `key-secret` file in `/home/bfx-cpp-api/app/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
+
+ ```BASH
+ cd /home/bfx-cpp-api/app/doc
+ echo <key> > key-secret
+ echo <secret> >> key-secret
+ ```
+
+6. Build example
+
+ ```BASH
+ cd /home/bfx-cpp-api/app/build
+ cmake ..
+ make
+ ```
+
+6. Run `example` binary
+
+	```BASH
+	cd /home/bfx-cpp-api/app/bin
+  ./example
+  ```
 
 ### Quick interface overview
 
-	// Create API client for both authenticated and unauthenticated requests
-	BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
-	
-	// Create API client for just unauthenticated requests
-	BfxAPI::BitfinexAPI bfxAPI();
-	
-	// Fetch data
-	bfxAPI.getTicker("btcusd");
-	
-	// Check for errors
-	if (!bfxAPI.hasApiError())
-	{
-	    // Get response in string
-	    cout << bfxAPI.strResponse() << endl;
-	}
-	else
-	{
-	    // Inspect errors
-	    cout << bfxAPI.getBfxApiStatusCode() << endl;
-	    cout << bfxAPI.getCurlStatusCode() << endl;
-	}
+	```C++
+		// Create API client for both authenticated and unauthenticated requests
+		BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
+
+		// Create API client for just unauthenticated requests
+		BfxAPI::BitfinexAPI bfxAPI();
+
+		// Fetch data
+		bfxAPI.getTicker("btcusd");
+
+		// Check for errors
+		if (!bfxAPI.hasApiError())
+		{
+		    // Get response in string
+		    cout << bfxAPI.strResponse() << endl;
+		}
+		else
+		{
+		    // Inspect errors
+		    cout << bfxAPI.getBfxApiStatusCode() << endl;
+		    cout << bfxAPI.getCurlStatusCode() << endl;
+		}
+	```
 
 See self-explanatory `src/example.cpp` for general usage and more requests.
 
