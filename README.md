@@ -124,6 +124,9 @@ See self-explanatory `src/example.cpp` for general usage and more requests.
 
 ### Change Log
 
+- 2018-09-26 Using the small Docker image Alpine instead of Debian.
+- 2018-09-26 Using docker-compose to build/up/down the image.
+- 2018-09-26 Grouping project files inside the app folder.
 - 2018-08-01 Dockerfile added. CircleCI added.
 - 2018-07-24 CMakeLists.txt added. Installation instructions changed.
 - 2018-07-11 Schema validation logic complete. Client currently validates public requests only.
