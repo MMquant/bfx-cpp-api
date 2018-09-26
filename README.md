@@ -131,6 +131,7 @@ See self-explanatory `src/example.cpp` for general usage and more requests.
 ### Known issues
 
 You will not be able to compile *bfx-cpp-api* with GCC<7.2 due to this [bug](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66297).
+You can use CLANG to avoid GCC bug.
 
 ### Author
 
