@@ -37,3 +37,19 @@ JSON_DEFINITIONS_FILE_PATH="${PROJECT_SOURCE_DIR}/doc/definitions.json"
 WITHDRAWAL_CONF_FILE_PATH="${PROJECT_SOURCE_DIR}/doc/withdraw.conf")
 # Enable all compiler warnings
 target_compile_options(example PRIVATE -Wall)
+
+################################################################################
+
+# TARGET test
+add_executable (test src/test.cpp)
+target_include_directories (test PRIVATE include)
+target_link_libraries(test
+PUBLIC bfxapicpp
+PRIVATE -lcryptopp -lcurl)
+# Assuming test executable built into /bin directory configuration files
+# will have following paths
+target_compile_definitions(test PUBLIC
+JSON_DEFINITIONS_FILE_PATH="${PROJECT_SOURCE_DIR}/doc/definitions.json"
+WITHDRAWAL_CONF_FILE_PATH="${PROJECT_SOURCE_DIR}/doc/withdraw.conf")
+# Enable all compiler warnings
+target_compile_options(test PRIVATE -Wall)
