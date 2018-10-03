@@ -143,8 +143,7 @@ namespace BfxAPI {
 
       string parseParams(map<string, string> params) {
         string pp = "";
-        map<string, string>::iterator it;
-        for (it = params.begin(); it != params.end(); it++) {
+        for (auto it = params.begin(); it != params.end(); it++) {
           pp += it->first + "=" + it->second + "&";
         }
         return pp;
@@ -267,8 +266,7 @@ namespace BfxAPI {
 
       void setupHeader() {
         curlHeader = nullptr;
-        map<string, string>::iterator it;
-        for (it = header.begin(); it != header.end(); it++) {
+        for (auto it = header.begin(); it != header.end(); it++) {
           curlHeader = curl_slist_append(
             curlHeader,
             (it->first + ":" + it->second).c_str()
