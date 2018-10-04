@@ -187,11 +187,7 @@ namespace BfxAPI {
       ////////////////////////////////////////////////////////////////////////
       // Private properties
       ////////////////////////////////////////////////////////////////////////
-      string endpoint = "";
-      string path = "";
-      string secretKey = "";
-      string accessKey = "";
-      string response = "";
+      string endpoint, path, secretKey, accessKey, response;
       map<string, string> header;
       struct curl_slist *curlHeader = nullptr;
 
