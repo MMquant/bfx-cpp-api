@@ -265,7 +265,7 @@ namespace BfxAPI {
         for (auto it = header.begin(); it != header.end(); it++) {
           curlHeader = curl_slist_append(
             curlHeader,
-            (it->first + ":" + it->second).c_str()
+            (it->first + ": " + it->second).c_str()
           );
         }
       };
