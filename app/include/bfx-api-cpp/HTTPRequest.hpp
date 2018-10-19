@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  TRequest.hpp
+//  HTTPRequest.hpp
 //
 //
 //  Bitfinex REST API C++ client
@@ -44,7 +44,7 @@ using CryptoPP::byte;
 
 namespace BfxAPI {
 
-  class TRequest {
+  class HTTPRequest {
 
     ////////////////////////////////////////////////////////////////////////
     // Class constants
@@ -56,13 +56,13 @@ namespace BfxAPI {
       ////////////////////////////////////////////////////////////////////////
       // Constructor / Destructor
       ////////////////////////////////////////////////////////////////////////
-      TRequest(string inEndpoint) {
+      HTTPRequest(string inEndpoint) {
         endpoint = inEndpoint;
         curlGET = curl_easy_init();
         curlPOST = curl_easy_init();
       };
 
-      ~TRequest() {
+      ~HTTPRequest() {
         curl_easy_cleanup(curlGET);
         curl_easy_cleanup(curlPOST);
       };

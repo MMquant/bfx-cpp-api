@@ -41,8 +41,8 @@
 // internal error
 #include "error.hpp"
 
-// internal TRequest
-#include "TRequest.hpp"
+// internal HTTPRequest
+#include "HTTPRequest.hpp"
 
 // namespaces
 using std::cerr;
@@ -97,7 +97,7 @@ namespace BfxAPI
         Request(API_URL),
         bfxApiStatusCode_(noError)
         {
-            // Internal TRequest set Keys
+            // Internal HTTPRequest set Keys
             Request.setAccessKey(accessKey);
             Request.setSecretKey(secretKey);
 
@@ -894,8 +894,8 @@ namespace BfxAPI
         string WDconfFilePath_;
         // internal jsonutils instances
         jsonutils::BfxSchemaValidator schemaValidator_;
-        // internal TRequest instance
-        TRequest Request;
+        // internal HTTPRequest instance
+        HTTPRequest Request;
         // dynamic and status variables
         BfxClientErrors bfxApiStatusCode_;
 
