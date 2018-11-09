@@ -49,13 +49,16 @@ namespace BfxAPI {
     ////////////////////////////////////////////////////////////////////////
     // Class constants
     ////////////////////////////////////////////////////////////////////////
+    
     static constexpr auto CURL_TIMEOUT = 30L;
     static constexpr auto CURL_DEBUG_VERBOSE = 0L;
 
     public:
+      
       ////////////////////////////////////////////////////////////////////////
       // Constructor / Destructor
       ////////////////////////////////////////////////////////////////////////
+      
       HTTPRequest(string inEndpoint) {
         endpoint = inEndpoint;
         curlGET = curl_easy_init();
@@ -184,9 +187,11 @@ namespace BfxAPI {
       }
 
     private:
+
       ////////////////////////////////////////////////////////////////////////
       // Private properties
       ////////////////////////////////////////////////////////////////////////
+      
       string endpoint, path, secretKey, accessKey, response;
       map<string, string> header;
       struct curl_slist *curlHeader = nullptr;
@@ -222,7 +227,7 @@ namespace BfxAPI {
 
         byte buffer[1024] = {};
 
-        for (int i = 0; i < content.length(); ++i)
+        for (auto i = 0; i < content.length(); ++i)
             buffer[i] = content[i];
 
         StringSource ss(

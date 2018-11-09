@@ -20,4 +20,9 @@ jobs:
       - run:
           name: Build project
           command: |
-            id && pwd
+            cd ~/project/app/build && cmake .. && make
+
+      - run:
+          name : Test
+          command: |
+            cd ~/project/app/bin && ./test

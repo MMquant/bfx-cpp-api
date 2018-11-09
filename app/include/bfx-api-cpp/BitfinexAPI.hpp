@@ -199,7 +199,7 @@ namespace BfxAPI
         constexpr void setWDconfFilePath(const string &path) noexcept
         { WDconfFilePath_ = path; }
 
-        constexpr void setKeys(const string &accessKey, const string &secretKey) noexcept
+        void setKeys(const string &accessKey, const string &secretKey) noexcept
         {
             Request.setAccessKey(accessKey);
             Request.setSecretKey(secretKey);
