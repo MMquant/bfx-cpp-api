@@ -1,8 +1,8 @@
 .DS_Store
-bin/
-build/
+app/bin/
 DerivedData/
 bfx-cpp-api.xcodeproj/
 include/.DS_Store
 include/rapidjson/.DS_Store
-key-secret
+app/doc/key-secret
+app/.ash_history

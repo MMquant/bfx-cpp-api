@@ -27,20 +27,19 @@ int main(int argc, char *argv[])
 {
     // Create bfxAPI without API keys
     BfxAPI::BitfinexAPI bfxAPI;
+
     // Create bfxAPI with API keys
     // BfxAPI::BitfinexAPI bfxAPI("accessKey", "secretKey");
-    
+
     // Load API keys from file
     ifstream ifs("../doc/key-secret", ifstream::in);
-    if (!ifs.is_open())
-    {
-        cerr << "Can't open 'key-secret' file. " << endl;
-        return 1;
+    if (ifs.is_open()) {
+        string accessKey; getline(ifs, accessKey);
+        string secretKey; getline(ifs, secretKey);
+        ifs.close();
+        bfxAPI.setKeys(accessKey, secretKey);
     }
-    getline(ifs, bfxAPI.getAccessKeyRef());
-    getline(ifs, bfxAPI.getSecretKeyRef());
-    ifs.close();
-    
+
     // Fetch API
     cout << "Request with error checking: " << endl;
     bfxAPI.getTicker("btcusd");
@@ -55,14 +54,14 @@ int main(int argc, char *argv[])
         cerr << "CurlStatusCode: ";
         cerr << bfxAPI.getCurlStatusCode() << endl;
     }
-    
+
     cout << "Request without error checking: " << endl;
     cout << bfxAPI.getSummary().strResponse() << endl;
-    
+
     ////////////////////////////////////////////////////////////////////////////
     ///  Available unauthenticated requests
     ////////////////////////////////////////////////////////////////////////////
-    
+
     //  bfxAPI.getTicker("btcusd");
     //  bfxAPI.getStats("btcusd");
     //  bfxAPI.getFundingBook("USD", 50, 50);
@@ -71,11 +70,11 @@ int main(int argc, char *argv[])
     //  bfxAPI.getLends("USD", 0L, 50);
     //  bfxAPI.getSymbols();
     //  bfxAPI.getSymbolsDetails();
-    
+
     ////////////////////////////////////////////////////////////////////////////
     ///  Available authenticated requests
     ////////////////////////////////////////////////////////////////////////////
-    
+
     ///  Account  ///
     //  bfxAPI.getAccountInfo();
     //  bfxAPI.getAccountFees();
@@ -86,7 +85,7 @@ int main(int argc, char *argv[])
     //  bfxAPI.getBalances();
     //  bfxAPI.transfer(0.1, "BTC", "trading", "deposit");
     //  bfxAPI.withdraw(); // configure withdraw.conf file before use
-    
+
     ///  Orders  ///
     //  bfxAPI.newOrder("btcusd",
     //                  0.01,
@@ -131,16 +130,16 @@ int main(int argc, char *argv[])
     //  bfxAPI.getOrderStatus(12113548453LL);
     //  bfxAPI.getActiveOrders();
     //  bfxAPI.getOrdersHistory(10);
-    
+
     ///  Positions  ///
     //  bfxAPI.getActivePositions();
     //  bfxAPI.claimPosition(156321412LL, 150);
-    
+
     ///  Historical data  ///
     //  bfxAPI.getBalanceHistory("USD", 0L, 0L, 500, "all");
     //  bfxAPI.getWithdrawalHistory("BTC", "all", 0L , 0L, 500);
     //  bfxAPI.getPastTrades("btcusd", 0L, 0L, 500, false);
-    
+
     ///  Margin funding  ///
     //  bfxAPI.newOffer("USD", 12000, 25.2, 30, "lend");
     //  bfxAPI.cancelOffer(12354245628LL);
@@ -154,6 +153,6 @@ int main(int argc, char *argv[])
     //  bfxAPI.getTotalTakenFunds();
     //  bfxAPI.closeLoan(1235845634LL);
     //  bfxAPI.closePosition(1235845634LL);
-    
+
     return 0;
 }
