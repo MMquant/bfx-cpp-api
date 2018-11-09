@@ -196,7 +196,7 @@ namespace BfxAPI
         }
 
         // Setters
-        constexpr void setWDconfFilePath(const string &path) noexcept
+        void setWDconfFilePath(const string &path) noexcept
         { WDconfFilePath_ = path; }
 
         void setKeys(const string &accessKey, const string &secretKey) noexcept
