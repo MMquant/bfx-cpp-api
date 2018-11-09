@@ -1,4 +1,4 @@
-![bfx-cpp-api logo](doc/logo/bfx-cpp-api_logo.png)
+![bfx-cpp-api logo](app/doc/logo/bfx-cpp-api_logo.png)
 
 ***
 
@@ -36,7 +36,7 @@ schema validation.
 1. Install dependencies (via apt, homebrew etc.).
 2. Clone or download *bfx-api-cpp* repository.
 3. Add `key-secret` file in `bfx-api-cpp/app/doc` directory. (or edit `example.cpp` so that it doesn't use `key-secret` file)
-4. Peek into self-documented `<your_project_dir>app/src/example.cpp`.
+4. Peek into self-documented `<your_project_dir>/app/src/example.cpp`.
 5. Build `example` binary
 
 ```BASH
@@ -135,6 +135,14 @@ See self-explanatory `src/example.cpp` for general usage and more requests.
 
 You will not be able to compile *bfx-cpp-api* with GCC<7.2 due to this [bug](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66297).
 You can use CLANG to avoid GCC bug.
+
+### Contribution
+
+1. Fork `bfx-cpp-api` repository.
+2. Commit to your ***develop*** branch.
+3. Create pull request from your ***develop*** branch to ***origin/develop*** branch.
+
+No direct pull request to ***master*** branch accepted!
 
 ### Author
 
